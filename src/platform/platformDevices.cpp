@@ -9,6 +9,15 @@ using namespace std;
 
 PlatformDevices::PlatformDevices() = default;
 
+PlatformDevices::PlatformDevices(cl_platform_id platform_id, const vector<cl_device_id>& selectedDevices)
+{
+    platform = platform_id;
+    devices = selectedDevices;
+    
+    createContextAndQueues();
+}
+
+
 PlatformDevices::PlatformDevices(cl_platform_id platform_id) : platform(platform_id) {
     cl_uint num_devices = 0;
     cl_int err = clGetDeviceIDs(platform, CL_DEVICE_TYPE_ALL, 0, nullptr, &num_devices);

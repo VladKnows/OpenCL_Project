@@ -6,14 +6,15 @@
 
 using namespace std;
 
+// Class for managing multiple PlattformDevices instances, each corresponding to a selected platform
 class WorkingGroup {
     private:
         vector<PlatformDevices> platformDevices;
 
-        void addPlatformDevices(const PlatformDevices& platformDevice);
-
     public:
         WorkingGroup();
-
+        
+        // UI for selecting the desired platforms and their devices
+        void selectPlatforms();
         void showDevices();
 };

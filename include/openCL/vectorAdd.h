@@ -15,6 +15,6 @@ class VectorAdd : public KernelExecutor {
 
         string kernelFilename() override;
         string kernelFunction() override;
-        void prepareData() override;
-        void setExtraArgs(cl_uint &argIndex)
+        bool prepareData() override;
+        bool setExtraArgs(cl_uint &argIndex);
 };

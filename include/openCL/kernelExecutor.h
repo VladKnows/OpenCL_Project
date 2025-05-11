@@ -7,15 +7,22 @@
 
 using namespace std;
 
+// Base class for executing OpenCL kernels on a device
 class KernelExecutor {
     private:
+        // Loads the OpenCL kernel source code from a file based on a file name
         string readKernel(const char* fileName);
+
+        // Creates and builds a program from the kernel source
+        // Uses readKernel
         cl_program createProgram(cl_context context, const char* fileName);
 
     protected:
         PlatformDevices &platformDevice;
         cl_context context;
         cl_command_queue queue;
+
+        // 
         cl_program program;
         
         cl_kernel kernel;
@@ -25,8 +32,8 @@ class KernelExecutor {
 
         virtual string kernelFilename() = 0;
         virtual string kernelFunction() = 0;
-        virtual void prepareData() = 0;
-        virtual void setExtraArgs(cl_uint &argIndex) = 0;
+        virtual bool prepareData() = 0;
+        virtual bool setExtraArgs(cl_uint &argIndex) = 0;
 
         bool createBuffers();
         bool setKernelArgs();
@@ -39,7 +46,7 @@ class KernelExecutor {
         virtual size_t globalSize() = 0;
 
     public:
-        KernelExecutor(PlatformDevices &pd, size_t deviceIndex = 0);
+        KernelExecutor(PlatformDevices &pd, size_t deviceIndex);
         virtual ~KernelExecutor();
 
         bool initialize();

@@ -1,3 +1,5 @@
+#define CL_TARGET_OPENCL_VERSION 300
+
 #include <vector>
 #include <iostream>
 
@@ -9,9 +11,8 @@ using namespace std;
 
 int main() {
     WorkingGroup workingGroup;
+    workingGroup.selectPlatforms();
     workingGroup.showDevices();
-
-    
 
     return 0;
 }
