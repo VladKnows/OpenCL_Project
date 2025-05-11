@@ -1,0 +1,14 @@
+# ninja log v5
+1	45	0	/home/radxa/Projects/OpenCL_Test/build/CMakeFiles/cmake.verify_globs	ff27874910201421
+53	789	1745523073728775075	CMakeFiles/opencl_app.dir/src/misc/platform.cpp.o	4a89c15e7680d635
+848	1039	1745751889028152742	opencl_app	e2de03974ce1ffbe
+46	658	1745751888654815515	CMakeFiles/opencl_app.dir/src/main.cpp.o	167512b1d12a6349
+45	139	1746963578844196781	build.ninja	957ddc731547a4ef
+48	789	1745751888784816871	CMakeFiles/opencl_app.dir/src/platform/platformDevices.cpp.o	a9624c982da4b935
+49	848	1745751888841484129	CMakeFiles/opencl_app.dir/src/platform/workingGroup.cpp.o	c9328c3c69d7e19e
+2	39	0	/home/radxa/Projects/OpenCL_Test/build/CMakeFiles/cmake.verify_globs	ff27874910201421
+41	1038	1746963760829897774	CMakeFiles/opencl_app.dir/src/openCL/vectorAdd.cpp.o	4b337cf456df63e4
+40	1064	1746963760856563806	CMakeFiles/opencl_app.dir/src/main.cpp.o	167512b1d12a6349
+41	1107	1746963760899896108	CMakeFiles/opencl_app.dir/src/platform/platformDevices.cpp.o	a9624c982da4b935
+41	1150	1746963760939895156	CMakeFiles/opencl_app.dir/src/platform/workingGroup.cpp.o	c9328c3c69d7e19e
+2	43	0	/home/radxa/Projects/OpenCL_Test/build/CMakeFiles/cmake.verify_globs	ff27874910201421
