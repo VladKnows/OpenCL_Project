@@ -9,7 +9,7 @@ using namespace std;
 
 PlatformDevices::PlatformDevices() = default;
 
-PlatformDevices::PlatformDevices(cl_platform_id platform_id, const vector<cl_device_id>& selectedDevices)
+PlatformDevices::PlatformDevices(cl_platform_id platform_id, const vector<Device>& selectedDevices)
 {
     platform = platform_id;
     devices = selectedDevices;
@@ -17,44 +17,20 @@ PlatformDevices::PlatformDevices(cl_platform_id platform_id, const vector<cl_dev
     createContextAndQueues();
 }
 
-
-PlatformDevices::PlatformDevices(cl_platform_id platform_id) : platform(platform_id) {
-    cl_uint num_devices = 0;
-    cl_int err = clGetDeviceIDs(platform, CL_DEVICE_TYPE_ALL, 0, nullptr, &num_devices);
-    if (err != CL_SUCCESS || num_devices == 0) {
-        cerr << "Warning: no devices found or error when querying devices! Error: " << err << '\n';
-        return;
-    }
-
-    devices.resize(num_devices);
-    err = clGetDeviceIDs(platform, CL_DEVICE_TYPE_ALL, num_devices, devices.data(), nullptr);
-    if (err != CL_SUCCESS) {
-        cerr << "Error getting device IDs after resize! Error: " << err << '\n';
-        devices.clear();
-    }
-
-    createContextAndQueues();
-}
-
 void PlatformDevices::showDevices()
 {
     for(int i = 0; i < devices.size(); ++i)
     {
-        size_t name_size = 0;
-        clGetDeviceInfo(devices[i], CL_DEVICE_NAME, 0, nullptr, &name_size);
-        vector<char> name(name_size);
-        clGetDeviceInfo(devices[i], CL_DEVICE_NAME, name_size, name.data(), nullptr);
-
         cl_device_type type;
-        clGetDeviceInfo(devices[i], CL_DEVICE_TYPE, sizeof(type), &type, nullptr);
+        clGetDeviceInfo(devices[i].id, CL_DEVICE_TYPE, sizeof(type), &type, nullptr);
 
         string type_str;
-        if (type & CL_DEVICE_TYPE_CPU) type_str += "CPU ";
-        if (type & CL_DEVICE_TYPE_GPU) type_str += "GPU ";
-        if (type & CL_DEVICE_TYPE_ACCELERATOR) type_str += "Accelerator ";
-        if (type & CL_DEVICE_TYPE_DEFAULT) type_str += "Default ";
+        if (type & CL_DEVICE_TYPE_CPU) type_str += "CPU";
+        if (type & CL_DEVICE_TYPE_GPU) type_str += "GPU";
+        if (type & CL_DEVICE_TYPE_ACCELERATOR) type_str += "Accelerator";
+        if (type & CL_DEVICE_TYPE_DEFAULT) type_str += "Default";
 
-        cout << "\tDevice #" << i << ": " << name.data() << " [" << type_str << "]\n";
+        cout << "\tDevice #" << i << ": " << devices[i].name << " [" << type_str << "]\n";
     }
 }
 
@@ -65,8 +41,12 @@ void PlatformDevices::createContextAndQueues()
         return;
     }
 
+    vector<cl_device_id> device_ids;
+    for (int i = 0; i < devices.size(); ++i)
+        device_ids.push_back(devices[i].id);
+
     cl_int err;
-    context = clCreateContext(nullptr, devices.size(), devices.data(), nullptr, nullptr, &err);
+    context = clCreateContext(nullptr, devices.size(), device_ids.data(), nullptr, nullptr, &err);
 
     if (err != CL_SUCCESS) {
         cerr << "Failed to create OpenCL context! Error: " << err << '\n';
@@ -74,19 +54,16 @@ void PlatformDevices::createContextAndQueues()
     }
 
     cout << "Context created successfully.\n";
-    commandQueues.clear();
 
-    for(auto device : devices)
+    for(auto& device : devices)
     {
         cl_command_queue_properties properties[] = { CL_QUEUE_PROPERTIES, CL_QUEUE_PROFILING_ENABLE, 0 };
 
-        cl_command_queue queue = clCreateCommandQueueWithProperties(context, device, properties, &err);
+        device.queue = clCreateCommandQueueWithProperties(context, device.id, properties, &err);
 
-        if (err != CL_SUCCESS) {
+        if (err != CL_SUCCESS)
             cerr << "Failed to create command queue! Error: " << err << '\n';
-        } else {
-            commandQueues.push_back(queue);
+        else
             cout << "Command queue created for device.\n";
-        }
     }
 }

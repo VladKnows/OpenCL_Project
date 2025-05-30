@@ -6,8 +6,8 @@ cmake_policy(SET CMP0009 NEW)
 file(GLOB_RECURSE NEW_GLOB LIST_DIRECTORIES false "/home/radxa/Projects/OpenCL_Test/src/*.cpp")
 set(OLD_GLOB
   "/home/radxa/Projects/OpenCL_Test/src/main.cpp"
-  "/home/radxa/Projects/OpenCL_Test/src/openCL/kernelExecutor.cpp"
-  "/home/radxa/Projects/OpenCL_Test/src/openCL/vectorAdd.cpp"
+  "/home/radxa/Projects/OpenCL_Test/src/openCL/kernelInfo.cpp"
+  "/home/radxa/Projects/OpenCL_Test/src/openCL/programInfo.cpp"
   "/home/radxa/Projects/OpenCL_Test/src/platform/platformDevices.cpp"
   "/home/radxa/Projects/OpenCL_Test/src/platform/workingGroup.cpp"
   )

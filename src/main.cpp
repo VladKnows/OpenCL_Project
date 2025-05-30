@@ -14,5 +14,7 @@ int main() {
     workingGroup.selectPlatforms();
     workingGroup.showDevices();
 
+    workingGroup.runOnOneDevice();
+
     return 0;
 }

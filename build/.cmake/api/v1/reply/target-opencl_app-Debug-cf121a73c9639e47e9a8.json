@@ -158,13 +158,13 @@
 		{
 			"backtrace" : 2,
 			"compileGroupIndex" : 0,
-			"path" : "src/openCL/kernelExecutor.cpp",
+			"path" : "src/openCL/kernelInfo.cpp",
 			"sourceGroupIndex" : 0
 		},
 		{
 			"backtrace" : 2,
 			"compileGroupIndex" : 0,
-			"path" : "src/openCL/vectorAdd.cpp",
+			"path" : "src/openCL/programInfo.cpp",
 			"sourceGroupIndex" : 0
 		},
 		{

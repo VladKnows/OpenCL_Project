@@ -17,4 +17,7 @@ class WorkingGroup {
         // UI for selecting the desired platforms and their devices
         void selectPlatforms();
         void showDevices();
+
+        // Running programs on the selected devices
+        void runOnOneDevice();
 };

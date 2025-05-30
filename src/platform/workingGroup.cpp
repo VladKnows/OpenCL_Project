@@ -124,7 +124,7 @@ void WorkingGroup::selectPlatforms()
             
             bool deviceSelected[num_devices];
             for(int i = 0; i < num_devices; ++i)
-                selected[i] = 0;
+                deviceSelected[i] = 0;
             
             int selectedCount = 0;
             int devChoice = 0;
@@ -158,10 +158,21 @@ void WorkingGroup::selectPlatforms()
                     cout << "Invalid choice.\n";
             }
     
-            vector<cl_device_id> selectedDevices;
-            for (int j = 0; j < num_devices; ++j)
+            vector<Device> selectedDevices;
+            for (int j = 0; j < num_devices; ++j) {
                 if (deviceSelected[j])
-                    selectedDevices.push_back(allDevices[j]);
+                {
+                    size_t name_size = 0;
+                    clGetDeviceInfo(allDevices[j], CL_DEVICE_NAME, 0, nullptr, &name_size);
+                    vector<char> name_buf(name_size);
+                    clGetDeviceInfo(allDevices[j], CL_DEVICE_NAME, name_size, name_buf.data(), nullptr);
+
+                    Device dev;
+                    dev.id = allDevices[j];
+                    dev.name = string(name_buf.data());
+                    selectedDevices.push_back(dev);
+                }
+            }
 
             platformDevices.push_back(PlatformDevices(platforms[i], selectedDevices));
         }
@@ -177,4 +188,53 @@ void WorkingGroup::showDevices()
         platformDevices[i].showDevices();
         cout << '\n';
     }
+}
+
+void WorkingGroup::runOnOneDevice()
+{
+    if(platformDevices.empty())
+    {
+        cerr << "No selected devices!\n";
+        return;
+    }
+    
+    vector<pair<int, int>> platformDeviceMap;
+    cout << "\nAvalabile Devices:\n";
+
+    int count = 0;
+    for(int i = 0; i < platformDevices.size(); ++i)
+    {
+        const PlatformDevices pd = platformDevices[i];
+        const vector<Device> devices = pd.getDevices();
+        
+        for(int j = 0; j < devices.size(); ++j)
+        {
+            cout << "\t[" << count << "] Platform #" << i << ", Device #" << j << ": " << devices[j].name << '\n';
+            platformDeviceMap.push_back(make_pair(i, j));
+            ++count;
+        }
+    }
+
+    if (platformDeviceMap.empty()) {
+        cerr << "No devices available!\n";
+        return;
+    }
+
+    int selected = -1;
+    cout << "\nSelect the device number to run on: ";
+    while (true) {
+        cin >> selected;
+        if (selected < 0 || selected >= platformDeviceMap.size())
+            cout << "Invalid selection. Try again: ";
+        else
+            break;
+    }
+
+    int platformIndex = platformDeviceMap[selected].first;
+    int deviceIndex = platformDeviceMap[selected].second;
+
+    cout << "\nSelected Platform #" << platformIndex << ", Device #" << deviceIndex
+    << ": " << platformDevices[platformIndex].getDevices()[deviceIndex].name << "\n";
+
+    
 }
