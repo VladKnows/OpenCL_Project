@@ -8,7 +8,8 @@ set(OLD_GLOB
   "/home/radxa/Projects/OpenCL_Test/src/main.cpp"
   "/home/radxa/Projects/OpenCL_Test/src/openCL/kernelInfo.cpp"
   "/home/radxa/Projects/OpenCL_Test/src/openCL/programInfo.cpp"
-  "/home/radxa/Projects/OpenCL_Test/src/platform/platformDevices.cpp"
+  "/home/radxa/Projects/OpenCL_Test/src/platform/device.cpp"
+  "/home/radxa/Projects/OpenCL_Test/src/platform/platform.cpp"
   "/home/radxa/Projects/OpenCL_Test/src/platform/workingGroup.cpp"
   )
 if(NOT "${NEW_GLOB}" STREQUAL "${OLD_GLOB}")

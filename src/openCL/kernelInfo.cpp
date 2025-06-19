@@ -1,7 +1,4 @@
-#include "../../include/openCL/kernelInfo.h"
-#include <fstream>
-#include <sstream>
-#include <iostream>
+#include "common.h"
 
 KernelInfo::KernelInfo(const string &fileName, const string &functionName, unsigned int globalSize, unsigned int localSize)
 {

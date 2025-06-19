@@ -1,5 +1,4 @@
-#include "../../include/openCL/programInfo.h"
-#include <iostream>
+#include "common.h"
 
 ProgramInfo::ProgramInfo(const string &name)
 {

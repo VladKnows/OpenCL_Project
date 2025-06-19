@@ -1,18 +1,11 @@
-#define CL_TARGET_OPENCL_VERSION 300
-
-#include <vector>
-#include <iostream>
-
-#include "platform/platformDevices.h"
-#include "platform/workingGroup.h"
-#include <CL/cl.h>
+#include "common.h"
 
 using namespace std;
 
-int main() {
-    WorkingGroup workingGroup;
-    workingGroup.selectPlatforms();
-    workingGroup.showDevices();
+int main()
+{
+    WorkingGroup workingGroup(SelectionMode::Automatic);
+    workingGroup.showSelectedPlatformsDevices();
 
     workingGroup.runOnOneDevice();
 

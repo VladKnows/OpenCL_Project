@@ -1,23 +1,26 @@
-#pragma once
-#include <vector>
-#include <CL/cl.h>
-
-#include "platform/platformDevices.h"
+#include "common.h"
 
 using namespace std;
 
-// Class for managing multiple PlattformDevices instances, each corresponding to a selected platform
+enum class SelectionMode {
+    Manual,
+    Automatic
+};
+
 class WorkingGroup {
     private:
-        vector<PlatformDevices> platformDevices;
+        vector<Platform> platforms;
+
+        void manuallySelectPlatforms();
+        void automaticallySelectPlatforms();
+        void createContextAndQueues();
+
+        pair<int, int> selectOneDevice() const;
 
     public:
-        WorkingGroup();
+        WorkingGroup(SelectionMode selectionMode);
         
-        // UI for selecting the desired platforms and their devices
-        void selectPlatforms();
-        void showDevices();
+        void showSelectedPlatformsDevices() const;
 
-        // Running programs on the selected devices
         void runOnOneDevice();
 };

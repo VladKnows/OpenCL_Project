@@ -1,88 +1,76 @@
-#include <CL/cl.h>
-#include <iostream>
-#include <vector>
-
-#include "platform/workingGroup.h"
+#include "common.h"
 
 using namespace std;
 
-WorkingGroup::WorkingGroup() {}
-
-void WorkingGroup::selectPlatforms()
+WorkingGroup::WorkingGroup(SelectionMode selectionMode)
 {
-    platformDevices.clear();
+    if(selectionMode == SelectionMode::Automatic)
+        automaticallySelectPlatforms();
+    else
+        manuallySelectPlatforms();
 
-    cl_uint num_platforms = 0;
-    cl_int err = clGetPlatformIDs(0, nullptr, &num_platforms);
-    if (err != CL_SUCCESS) {
+    createContextAndQueues();
+}
+
+void WorkingGroup::manuallySelectPlatforms()
+{
+    platforms.clear();
+
+    cl_uint numPlatforms = 0;
+    cl_int err = clGetPlatformIDs(0, nullptr, &numPlatforms);
+    if (err != CL_SUCCESS)
+    {
         cerr << "Failed to get number of platforms. Error: " << err << '\n';
         return;
     }
 
-    cout << "Number of avalabile OpenCL platforms: " << num_platforms << '\n';
-
-    if (num_platforms == 0) {
+    cout << "Number of avalabile OpenCL platforms: " << numPlatforms << '\n';
+    if (numPlatforms == 0)
+    {
         cout << "No OpenCL platforms on this system!" << '\n';
         return;
     }
 
-    vector<cl_platform_id> platforms(num_platforms);
-    err = clGetPlatformIDs(num_platforms, platforms.data(), nullptr);
-    if (err != CL_SUCCESS) {
+    vector<cl_platform_id> platformsIds(numPlatforms);
+    err = clGetPlatformIDs(numPlatforms, platformsIds.data(), nullptr);
+    if (err != CL_SUCCESS)
+    {
         cerr << "Failed to get platform IDs. Error: " << err << '\n';
         return;
     }
 
-    // !Remove dummies
-    cl_platform_id dummy1 = (cl_platform_id)0x1111;
-    cl_platform_id dummy2 = (cl_platform_id)0x2222;
-    cl_platform_id dummy3 = (cl_platform_id)0x3333;
-
-    platforms.push_back(dummy1);
-    platforms.push_back(dummy2);
-    platforms.push_back(dummy3);
-
-    num_platforms += 3;
-    // !Remove up to here
-
-    bool selected[num_platforms];
-    for(int i = 0; i < num_platforms; ++i)
+    bool selected[numPlatforms];
+    for(int i = 0; i < numPlatforms; ++i)
         selected[i] = 0;
-    int no_selected_platforms = 0;
+    int nrOfSelectedPlatforms = 0;
 
     int choice = 0;
     while(1)
     {
-        cout << "Select/Deselect platforms index (0 - " << num_platforms - 1 << "):\n";
+        cout << "Select/Deselect platforms index (0 - " << numPlatforms - 1 << "):\n";
 
-        for (cl_uint i = 0; i < num_platforms; ++i) {
+        for (cl_uint i = 0; i < numPlatforms; ++i) {
             string name;
             
-            // !Remove dummies
-            if (platforms[i] == dummy1) name = "Dummy Platform 1";
-            else if (platforms[i] == dummy2) name = "Dummy Platform 2";
-            else if (platforms[i] == dummy3) name = "Dummy Platform 3";
-            else {
-                size_t name_size = 0;
-                clGetPlatformInfo(platforms[i], CL_PLATFORM_NAME, 0, nullptr, &name_size);
+            size_t nameSize = 0;
+            clGetPlatformInfo(platformsIds[i], CL_PLATFORM_NAME, 0, nullptr, &nameSize);
 
-                vector<char> name_buf(name_size);
-                clGetPlatformInfo(platforms[i], CL_PLATFORM_NAME, name_size, name_buf.data(), nullptr);
+            vector<char> nameBuffer(nameSize);
+            clGetPlatformInfo(platformsIds[i], CL_PLATFORM_NAME, nameSize, nameBuffer.data(), nullptr);
 
-                name = name_buf.data();
-            }
+            name = nameBuffer.data();
     
             cout << "\t[" << (selected[i] ? '*' : ' ') << "] Platform #" << i << ": " << name << '\n';
         }
 
-        cout << "\tOr enter " << num_platforms << " to finish.\n\n";
+        cout << "\tOr enter " << numPlatforms << " to finish.\n\n";
         cout << "Enter number: ";
 
         while(1)
         {
             cin >> choice;
             
-            if(choice < 0 || choice > num_platforms)
+            if(choice < 0 || choice > numPlatforms)
             {
                 cout << "Number is not in the specified interval.\n";
                 cout << "Enter another number: ";
@@ -91,150 +79,265 @@ void WorkingGroup::selectPlatforms()
                 break;
         }
 
-        if(choice == num_platforms)
+        if(choice == numPlatforms)
         {
-            if(no_selected_platforms == 0)
+            if(nrOfSelectedPlatforms == 0)
                 cout << "No selected platforms!\n";
             else
                 break;
         }
         else
         {
-            no_selected_platforms += (selected[choice] ? -1 : 1);
-
+            nrOfSelectedPlatforms += (selected[choice] ? -1 : 1);
             selected[choice] = !selected[choice];
         }
     }
 
-    for (int i = 0; i < num_platforms; ++i) {
-        if (selected[i]) {
-            cl_uint num_devices = 0;
-            cl_int err = clGetDeviceIDs(platforms[i], CL_DEVICE_TYPE_ALL, 0, nullptr, &num_devices);
-            if (err != CL_SUCCESS || num_devices == 0) {
+    for (int i = 0; i < numPlatforms; ++i) {
+        if (selected[i])
+        {
+            cl_uint numDevices = 0;
+            cl_int err = clGetDeviceIDs(platformsIds[i], CL_DEVICE_TYPE_ALL, 0, nullptr, &numDevices);
+            if (err != CL_SUCCESS || numDevices == 0)
+            {
                 cerr << "No devices found for platform " << i << " or error: " << err << '\n';
                 continue;
             }
     
-            vector<cl_device_id> allDevices(num_devices);
-            err = clGetDeviceIDs(platforms[i], CL_DEVICE_TYPE_ALL, num_devices, allDevices.data(), nullptr);
-            if (err != CL_SUCCESS) {
+            vector<cl_device_id> allDevices(numDevices);
+            err = clGetDeviceIDs(platformsIds[i], CL_DEVICE_TYPE_ALL, numDevices, allDevices.data(), nullptr);
+            if (err != CL_SUCCESS)
+            {
                 cerr << "Failed to get devices for platform " << i << ". Error: " << err << '\n';
                 continue;
             }
             
-            bool deviceSelected[num_devices];
-            for(int i = 0; i < num_devices; ++i)
+            bool deviceSelected[numDevices];
+            for(int i = 0; i < numDevices; ++i)
                 deviceSelected[i] = 0;
             
             int selectedCount = 0;
-            int devChoice = 0;
+            int deviceChoice = 0;
     
-            while (true) {
+            while (true)
+            {
                 cout << "\nSelect/Deselect devices for Platform #" << i << ":\n";
-                for (int j = 0; j < num_devices; ++j) {
-                    size_t name_size = 0;
-                    clGetDeviceInfo(allDevices[j], CL_DEVICE_NAME, 0, nullptr, &name_size);
-                    vector<char> name_buf(name_size);
-                    clGetDeviceInfo(allDevices[j], CL_DEVICE_NAME, name_size, name_buf.data(), nullptr);
+                for (int j = 0; j < numDevices; ++j) {
+                    size_t nameSize = 0;
+                    clGetDeviceInfo(allDevices[j], CL_DEVICE_NAME, 0, nullptr, &nameSize);
+                    vector<char> nameBuffer(nameSize);
+                    clGetDeviceInfo(allDevices[j], CL_DEVICE_NAME, nameSize, nameBuffer.data(), nullptr);
     
-                    cout << "\t[" << (deviceSelected[j] ? '*' : ' ') << "] Device #" << j << ": " << name_buf.data() << '\n';
+                    cout << "\t[" << (deviceSelected[j] ? '*' : ' ') << "] Device #" << j << ": " << nameBuffer.data() << '\n';
                 }
     
-                cout << "\tOr enter " << num_devices << " to finish selection.\n";
+                cout << "\tOr enter " << numDevices << " to finish selection.\n";
                 cout << "Enter number: ";
-                cin >> devChoice;
+                cin >> deviceChoice;
     
-                if (devChoice == num_devices) {
+                if (deviceChoice == numDevices)
+                {
                     if (selectedCount == 0)
                         cout << "No devices selected!\n";
                     else
                         break;
                 }
-                else if (devChoice >= 0 && devChoice < num_devices) {
-                    deviceSelected[devChoice] = !deviceSelected[devChoice];
-                    selectedCount += deviceSelected[devChoice] ? 1 : -1;
+                else if (deviceChoice >= 0 && deviceChoice < numDevices)
+                {
+                    deviceSelected[deviceChoice] = !deviceSelected[deviceChoice];
+                    selectedCount += deviceSelected[deviceChoice] ? 1 : -1;
                 }
                 else
                     cout << "Invalid choice.\n";
             }
     
             vector<Device> selectedDevices;
-            for (int j = 0; j < num_devices; ++j) {
+            for (int j = 0; j < numDevices; ++j) {
                 if (deviceSelected[j])
                 {
-                    size_t name_size = 0;
-                    clGetDeviceInfo(allDevices[j], CL_DEVICE_NAME, 0, nullptr, &name_size);
-                    vector<char> name_buf(name_size);
-                    clGetDeviceInfo(allDevices[j], CL_DEVICE_NAME, name_size, name_buf.data(), nullptr);
+                    size_t nameSize = 0;
+                    clGetDeviceInfo(allDevices[j], CL_DEVICE_NAME, 0, nullptr, &nameSize);
+                    vector<char> nameBuffer(nameSize);
+                    clGetDeviceInfo(allDevices[j], CL_DEVICE_NAME, nameSize, nameBuffer.data(), nullptr);
 
-                    Device dev;
-                    dev.id = allDevices[j];
-                    dev.name = string(name_buf.data());
+                    cl_device_type type_id;
+                    clGetDeviceInfo(allDevices[j], CL_DEVICE_TYPE, sizeof(type_id), &type_id, nullptr);
+
+                    string type;
+                    if (type_id & CL_DEVICE_TYPE_CPU) type += "CPU";
+                    if (type_id & CL_DEVICE_TYPE_GPU) type += "GPU";
+                    if (type_id & CL_DEVICE_TYPE_ACCELERATOR) type += "Accelerator";
+                    if (type_id & CL_DEVICE_TYPE_DEFAULT) type += "Default";
+
+                    Device dev(allDevices[j], type, string(nameBuffer.data()));
                     selectedDevices.push_back(dev);
                 }
             }
+            size_t nameSize = 0;
+            clGetPlatformInfo(platformsIds[i], CL_PLATFORM_NAME, 0, nullptr, &nameSize);
+            vector<char> nameBuffer(nameSize);
+            clGetPlatformInfo(platformsIds[i], CL_PLATFORM_NAME, nameSize, nameBuffer.data(), nullptr);
+            string platformName(nameBuffer.data());
 
-            platformDevices.push_back(PlatformDevices(platforms[i], selectedDevices));
+            platforms.push_back(Platform(platformsIds[i], platformName, selectedDevices));
         }
     }
 }
 
-void WorkingGroup::showDevices()
+void WorkingGroup::automaticallySelectPlatforms()
+{
+    platforms.clear();
+
+    cl_uint numPlatforms = 0;
+    cl_int err = clGetPlatformIDs(0, nullptr, &numPlatforms);
+    if (err != CL_SUCCESS || numPlatforms == 0)
+    {
+        cerr << "No OpenCL platforms found. Error: " << err << '\n';
+        return;
+    }
+
+    vector<cl_platform_id> platformIds(numPlatforms);
+    clGetPlatformIDs(numPlatforms, platformIds.data(), nullptr);
+
+    for (int i = 0; i < numPlatforms; ++i)
+    {
+        cl_platform_id platformId = platformIds[i];
+
+        size_t nameSize = 0;
+        clGetPlatformInfo(platformId, CL_PLATFORM_NAME, 0, nullptr, &nameSize);
+        vector<char> nameBuffer(nameSize);
+        clGetPlatformInfo(platformId, CL_PLATFORM_NAME, nameSize, nameBuffer.data(), nullptr);
+        string platformName(nameBuffer.data());
+
+        cl_uint numDevices = 0;
+        err = clGetDeviceIDs(platformId, CL_DEVICE_TYPE_ALL, 0, nullptr, &numDevices);
+        if (err != CL_SUCCESS || numDevices == 0)
+        {
+            cerr << "No devices found on platform: " << platformName << '\n';
+            continue;
+        }
+
+        vector<cl_device_id> deviceIds(numDevices);
+        clGetDeviceIDs(platformId, CL_DEVICE_TYPE_ALL, numDevices, deviceIds.data(), nullptr);
+
+        vector<Device> devices;
+        for (int j = 0; j < numDevices; ++j) {
+            cl_device_id deviceId = deviceIds[j];
+
+            size_t nameSize = 0;
+            clGetDeviceInfo(deviceId, CL_DEVICE_NAME, 0, nullptr, &nameSize);
+            vector<char> nameBuffer(nameSize);
+            clGetDeviceInfo(deviceId, CL_DEVICE_NAME, nameSize, nameBuffer.data(), nullptr);
+            string deviceName(nameBuffer.data());
+
+            cl_device_type typeId;
+            clGetDeviceInfo(deviceId, CL_DEVICE_TYPE, sizeof(typeId), &typeId, nullptr);
+            string type;
+            if (typeId & CL_DEVICE_TYPE_CPU) type += "CPU";
+            if (typeId & CL_DEVICE_TYPE_GPU) type += "GPU";
+            if (typeId & CL_DEVICE_TYPE_ACCELERATOR) type += "Accelerator";
+            if (typeId & CL_DEVICE_TYPE_DEFAULT) type += "Default";
+
+            devices.push_back(Device(deviceId, type, deviceName));
+        }
+
+        platforms.push_back(Platform(platformId, platformName, devices));
+    }
+
+    if (platforms.empty())
+        cerr << "No valid platforms with devices were found.\n";
+    else
+        cout << "Successfully selected " << platforms.size() << " platforms.\n";
+}
+
+void WorkingGroup::showSelectedPlatformsDevices() const
 {
     cout << '\n';
-    for (int i = 0; i < platformDevices.size(); ++i) {
-        cout << "Devices for Platform #" << i << ":\n";
-
-        platformDevices[i].showDevices();
+    for (int i = 0; i < platforms.size(); ++i) {
+        platforms[i].showPlatformInfo();
+        platforms[i].showSelectedDevices();
         cout << '\n';
     }
 }
 
-void WorkingGroup::runOnOneDevice()
+void WorkingGroup::createContextAndQueues()
 {
-    if(platformDevices.empty())
+    for(int i = 0; i < platforms.size(); ++i)
+        platforms[i].createContextAndQueues();
+}
+
+pair<int, int> WorkingGroup::selectOneDevice() const
+{
+    if(platforms.empty())
     {
         cerr << "No selected devices!\n";
-        return;
+        return make_pair(-1, -1);
     }
-    
+
     vector<pair<int, int>> platformDeviceMap;
+
     cout << "\nAvalabile Devices:\n";
 
     int count = 0;
-    for(int i = 0; i < platformDevices.size(); ++i)
+    for(int i = 0; i < platforms.size(); ++i)
     {
-        const PlatformDevices pd = platformDevices[i];
-        const vector<Device> devices = pd.getDevices();
+        const Platform &pd = platforms[i];
+        const vector<Device> &devices = pd.getDevices();
         
+        pd.showPlatformInfo();
         for(int j = 0; j < devices.size(); ++j)
         {
-            cout << "\t[" << count << "] Platform #" << i << ", Device #" << j << ": " << devices[j].name << '\n';
+            cout << "\t[" << count << "] ";
+            devices[j].showDeviceInfo();
+
             platformDeviceMap.push_back(make_pair(i, j));
             ++count;
         }
     }
 
-    if (platformDeviceMap.empty()) {
-        cerr << "No devices available!\n";
-        return;
-    }
-
     int selected = -1;
     cout << "\nSelect the device number to run on: ";
-    while (true) {
+    while (true)
+    {
         cin >> selected;
+
         if (selected < 0 || selected >= platformDeviceMap.size())
             cout << "Invalid selection. Try again: ";
         else
             break;
     }
 
-    int platformIndex = platformDeviceMap[selected].first;
-    int deviceIndex = platformDeviceMap[selected].second;
+    return platformDeviceMap[selected];
+}
 
-    cout << "\nSelected Platform #" << platformIndex << ", Device #" << deviceIndex
-    << ": " << platformDevices[platformIndex].getDevices()[deviceIndex].name << "\n";
+void WorkingGroup::runOnOneDevice()
+{
+    pair<int, int> platformDeviceIndex;
 
+    if(platforms.size() == 0)
+    {
+        cout << "No devices were selected!\n";
+        return;
+    }
+    else if (platforms.size() == 1 && platforms[0].getDevices().size() == 1)
+    {
+        platformDeviceIndex = pair<int, int> (0, 0);
+    }
+    else
+    {
+        platformDeviceIndex = selectOneDevice();
+
+        if(platformDeviceIndex.first == -1 || platformDeviceIndex.second == -1)
+        {
+            cerr << "Platform/Device wasn't selected properly!\n";
+            return;
+        }
+    }
     
+    cout << "Selected Platform:\n";
+    platforms[platformDeviceIndex.first].showPlatformInfo();
+    cout << "Selected Device:\n";
+    platforms[platformDeviceIndex.first].getDevices()[platformDeviceIndex.second].showDeviceInfo();
+
+
 }

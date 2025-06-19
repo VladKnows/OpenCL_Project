@@ -1,5 +1,4 @@
-#include <vector>
-#include "kernelInfo.h"
+#include "common.h"
 
 using namespace std;
 
