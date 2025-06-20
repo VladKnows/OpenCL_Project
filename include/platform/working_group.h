@@ -22,5 +22,7 @@ class WorkingGroup {
         
         void showSelectedPlatformsDevices() const;
 
-        void runOnOneDevice();
+        vector<Platform> getPlatforms() { return platforms; }
+
+        void runOnOneDevice(KernelExecutor &executor);
 };

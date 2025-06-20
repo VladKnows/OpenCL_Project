@@ -6,6 +6,7 @@ Device::Device(cl_device_id id, const string &type, const string &name)
 const cl_device_id &Device::getDeviceId() const { return device_id; }
 const string &Device::getDeviceType() const { return device_type; }
 const string &Device::getDeviceName() const { return device_name; }
+const cl_command_queue &Device::getCommandQueue() const { return command_queue; }
 
 void Device::showDeviceInfo() const
 {

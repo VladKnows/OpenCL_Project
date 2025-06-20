@@ -310,7 +310,7 @@ pair<int, int> WorkingGroup::selectOneDevice() const
     return platformDeviceMap[selected];
 }
 
-void WorkingGroup::runOnOneDevice()
+void WorkingGroup::runOnOneDevice(KernelExecutor &executor)
 {
     pair<int, int> platformDeviceIndex;
 
@@ -334,10 +334,22 @@ void WorkingGroup::runOnOneDevice()
         }
     }
     
+    const Platform &p = platforms[platformDeviceIndex.first];
+    const Device &d = p.getDevices()[platformDeviceIndex.second];
+
     cout << "Selected Platform:\n";
-    platforms[platformDeviceIndex.first].showPlatformInfo();
+    p.showPlatformInfo();
     cout << "Selected Device:\n";
-    platforms[platformDeviceIndex.first].getDevices()[platformDeviceIndex.second].showDeviceInfo();
+    d.showDeviceInfo();
 
+    Program& openclProgram = executor.getProgram();
+    openclProgram.setContext(p.getContext());
 
+    vector<Device*> devs = { &const_cast<Device&>(d) };
+    openclProgram.setDevices(devs);
+
+    openclProgram.compileProgram();
+
+    executor.allocateBuffers();
+    executor.execute();
 }

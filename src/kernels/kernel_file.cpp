@@ -53,7 +53,7 @@ void KernelFile::addKernelFunction(const string &functionName, size_t globalSize
 
 const string &KernelFile::getSourceCode() const { return sourceCode; }
 const string &KernelFile::getFileName() const { return fileName; }
-const vector<KernelFunction>& Program::getKernelFunctions() const { return kernel_functions; }
+const vector<KernelFunction>& KernelFile::getKernelFunctions() const { return functions; }
 
 void KernelFile::showKernelFileInfo() const
 {

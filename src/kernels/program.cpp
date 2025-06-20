@@ -1,8 +1,14 @@
 #include "common.h"
 using namespace std;
 
-Program::Program(const string &name, cl_context context, const vector<Device> &devs)
+Program::Program(const string &name, cl_context context, const vector<Device*> &devs)
     : program_name(name), context(context), devices(devs) {}
+
+Program::Program(const string &name)
+    : program_name(name) {}
+
+void Program::setContext(cl_context ctx) { context = ctx; }
+void Program::setDevices(const vector<Device*> &devs) { devices = devs; }
 
 void Program::addKernelFunctions(const KernelFile &file)
 {
@@ -58,7 +64,7 @@ void Program::compileProgram()
 
     vector<cl_device_id> deviceIds;
     for (int i = 0; i < devices.size(); ++i) {
-        deviceIds.push_back(devices[i].getDeviceId());
+        deviceIds.push_back(devices[i]->getDeviceId());
     }
     
     err = clBuildProgram(program, deviceIds.size(), deviceIds.data(), nullptr, nullptr, nullptr);        
@@ -78,7 +84,9 @@ void Program::compileProgram()
 }
 
 cl_program Program::getProgram() const { return program; }
+cl_context Program::getContext() const { return context; }
 const vector<KernelFunction>& Program::getKernelFunctions() const { return kernel_functions; }
+const vector<Device*>& Program::getDevices() const { return devices; }
 const string& Program::getProgramName() const { return program_name; }
 
 void Program::showProgramInfo() const

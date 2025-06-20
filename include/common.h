@@ -6,13 +6,17 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
+#include <initializer_list>
+#include <stdexcept>
 
 #define CL_TARGET_OPENCL_VERSION 300
 #include <CL/cl.h>
 
+#include "kernels/buffer.h"
+#include "platform/device.h"
 #include "kernels/kernel_function.h"
 #include "kernels/kernel_file.h"
 #include "kernels/program.h"
-#include "platform/device.h"
+#include "kernels/kernel_executor.h"
 #include "platform/platform.h"
 #include "platform/working_group.h"

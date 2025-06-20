@@ -5,6 +5,8 @@ cmake_policy(SET CMP0009 NEW)
 # SRC_FILES at CMakeLists.txt:10 (file)
 file(GLOB_RECURSE NEW_GLOB LIST_DIRECTORIES false "/home/radxa/Projects/OpenCL_Test/src/*.cpp")
 set(OLD_GLOB
+  "/home/radxa/Projects/OpenCL_Test/src/kernels/buffer.cpp"
+  "/home/radxa/Projects/OpenCL_Test/src/kernels/kernel_executor.cpp"
   "/home/radxa/Projects/OpenCL_Test/src/kernels/kernel_file.cpp"
   "/home/radxa/Projects/OpenCL_Test/src/kernels/kernel_function.cpp"
   "/home/radxa/Projects/OpenCL_Test/src/kernels/program.cpp"

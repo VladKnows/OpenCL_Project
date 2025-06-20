@@ -4,9 +4,9 @@ using namespace std;
 
 class Device {
     private:
-        const cl_device_id device_id;
-        const string device_type;
-        const string device_name;
+        cl_device_id device_id;
+        string device_type;
+        string device_name;
         cl_command_queue command_queue = nullptr;
 
     public:
@@ -15,6 +15,7 @@ class Device {
         const cl_device_id &getDeviceId() const;
         const string &getDeviceType() const;
         const string &getDeviceName() const;
+        const cl_command_queue &getCommandQueue() const;
 
         void showDeviceInfo() const;
         

@@ -32,10 +32,9 @@ void Platform::createContextAndQueues()
     }
     cout << "Context created successfully.\n";
 
-    for(auto& device : devices)
-    {
-        cout << "Creating command queue for device: " << device.getDeviceName() << '\n';
-        device.createCommandQueue(context);
+    for (int i = 0; i < devices.size(); ++i) {
+        cout << "Creating command queue for device: " << devices[i].getDeviceName() << '\n';
+        devices[i].createCommandQueue(context);
     }
 }
 
