@@ -1,18 +1,23 @@
 [
 {
   "directory": "/home/radxa/Projects/OpenCL_Test/build",
+  "command": "/usr/bin/clang++ -I/home/radxa/Projects/OpenCL_Test/include -I/opt/vcpkg/installed/arm64-linux/include -g -std=gnu++17 -o CMakeFiles/opencl_app.dir/src/kernels/kernel_file.cpp.o -c /home/radxa/Projects/OpenCL_Test/src/kernels/kernel_file.cpp",
+  "file": "/home/radxa/Projects/OpenCL_Test/src/kernels/kernel_file.cpp"
+},
+{
+  "directory": "/home/radxa/Projects/OpenCL_Test/build",
+  "command": "/usr/bin/clang++ -I/home/radxa/Projects/OpenCL_Test/include -I/opt/vcpkg/installed/arm64-linux/include -g -std=gnu++17 -o CMakeFiles/opencl_app.dir/src/kernels/kernel_function.cpp.o -c /home/radxa/Projects/OpenCL_Test/src/kernels/kernel_function.cpp",
+  "file": "/home/radxa/Projects/OpenCL_Test/src/kernels/kernel_function.cpp"
+},
+{
+  "directory": "/home/radxa/Projects/OpenCL_Test/build",
+  "command": "/usr/bin/clang++ -I/home/radxa/Projects/OpenCL_Test/include -I/opt/vcpkg/installed/arm64-linux/include -g -std=gnu++17 -o CMakeFiles/opencl_app.dir/src/kernels/program.cpp.o -c /home/radxa/Projects/OpenCL_Test/src/kernels/program.cpp",
+  "file": "/home/radxa/Projects/OpenCL_Test/src/kernels/program.cpp"
+},
+{
+  "directory": "/home/radxa/Projects/OpenCL_Test/build",
   "command": "/usr/bin/clang++ -I/home/radxa/Projects/OpenCL_Test/include -I/opt/vcpkg/installed/arm64-linux/include -g -std=gnu++17 -o CMakeFiles/opencl_app.dir/src/main.cpp.o -c /home/radxa/Projects/OpenCL_Test/src/main.cpp",
   "file": "/home/radxa/Projects/OpenCL_Test/src/main.cpp"
-},
-{
-  "directory": "/home/radxa/Projects/OpenCL_Test/build",
-  "command": "/usr/bin/clang++ -I/home/radxa/Projects/OpenCL_Test/include -I/opt/vcpkg/installed/arm64-linux/include -g -std=gnu++17 -o CMakeFiles/opencl_app.dir/src/openCL/kernelInfo.cpp.o -c /home/radxa/Projects/OpenCL_Test/src/openCL/kernelInfo.cpp",
-  "file": "/home/radxa/Projects/OpenCL_Test/src/openCL/kernelInfo.cpp"
-},
-{
-  "directory": "/home/radxa/Projects/OpenCL_Test/build",
-  "command": "/usr/bin/clang++ -I/home/radxa/Projects/OpenCL_Test/include -I/opt/vcpkg/installed/arm64-linux/include -g -std=gnu++17 -o CMakeFiles/opencl_app.dir/src/openCL/programInfo.cpp.o -c /home/radxa/Projects/OpenCL_Test/src/openCL/programInfo.cpp",
-  "file": "/home/radxa/Projects/OpenCL_Test/src/openCL/programInfo.cpp"
 },
 {
   "directory": "/home/radxa/Projects/OpenCL_Test/build",
@@ -26,7 +31,7 @@
 },
 {
   "directory": "/home/radxa/Projects/OpenCL_Test/build",
-  "command": "/usr/bin/clang++ -I/home/radxa/Projects/OpenCL_Test/include -I/opt/vcpkg/installed/arm64-linux/include -g -std=gnu++17 -o CMakeFiles/opencl_app.dir/src/platform/workingGroup.cpp.o -c /home/radxa/Projects/OpenCL_Test/src/platform/workingGroup.cpp",
-  "file": "/home/radxa/Projects/OpenCL_Test/src/platform/workingGroup.cpp"
+  "command": "/usr/bin/clang++ -I/home/radxa/Projects/OpenCL_Test/include -I/opt/vcpkg/installed/arm64-linux/include -g -std=gnu++17 -o CMakeFiles/opencl_app.dir/src/platform/working_group.cpp.o -c /home/radxa/Projects/OpenCL_Test/src/platform/working_group.cpp",
+  "file": "/home/radxa/Projects/OpenCL_Test/src/platform/working_group.cpp"
 }
 ]

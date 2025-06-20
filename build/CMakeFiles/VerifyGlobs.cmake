@@ -5,12 +5,13 @@ cmake_policy(SET CMP0009 NEW)
 # SRC_FILES at CMakeLists.txt:10 (file)
 file(GLOB_RECURSE NEW_GLOB LIST_DIRECTORIES false "/home/radxa/Projects/OpenCL_Test/src/*.cpp")
 set(OLD_GLOB
+  "/home/radxa/Projects/OpenCL_Test/src/kernels/kernel_file.cpp"
+  "/home/radxa/Projects/OpenCL_Test/src/kernels/kernel_function.cpp"
+  "/home/radxa/Projects/OpenCL_Test/src/kernels/program.cpp"
   "/home/radxa/Projects/OpenCL_Test/src/main.cpp"
-  "/home/radxa/Projects/OpenCL_Test/src/openCL/kernelInfo.cpp"
-  "/home/radxa/Projects/OpenCL_Test/src/openCL/programInfo.cpp"
   "/home/radxa/Projects/OpenCL_Test/src/platform/device.cpp"
   "/home/radxa/Projects/OpenCL_Test/src/platform/platform.cpp"
-  "/home/radxa/Projects/OpenCL_Test/src/platform/workingGroup.cpp"
+  "/home/radxa/Projects/OpenCL_Test/src/platform/working_group.cpp"
   )
 if(NOT "${NEW_GLOB}" STREQUAL "${OLD_GLOB}")
   message("-- GLOB mismatch!")
