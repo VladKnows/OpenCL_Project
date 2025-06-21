@@ -20,9 +20,9 @@ class WorkingGroup {
     public:
         WorkingGroup(SelectionMode selectionMode);
         
-        void showSelectedPlatformsDevices() const;
-
         vector<Platform> getPlatforms() { return platforms; }
+
+        void showSelectedPlatformsDevices() const;
 
         void runOnOneDevice(KernelExecutor &executor);
 };

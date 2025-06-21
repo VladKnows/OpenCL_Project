@@ -1,4 +1,5 @@
 #include "common.h"
+
 using namespace std;
 
 Program::Program(const string &name, cl_context context, const vector<Device*> &devs)
@@ -12,12 +13,10 @@ void Program::setDevices(const vector<Device*> &devs) { devices = devs; }
 
 void Program::addKernelFunctions(const KernelFile &file)
 {
-    for (int i = 0; i < kernel_files.size(); ++i) {
+    for (int i = 0; i < kernel_files.size(); ++i)
+    {
         if (kernel_files[i].getFileName() == file.getFileName())
-        {
-            cerr << "Kernel file '" << file.getFileName() << "' already added to the program.\n";
-            return;
-        }
+            throw runtime_error("Kernel file '" + file.getFileName() + "' already added to the program.");
     }
 
     kernel_files.push_back(file);
@@ -38,21 +37,21 @@ void Program::addKernelFunctions(const KernelFile &file)
         if (!exists)
             kernel_functions.push_back(funcs[i]);
         else
-            cerr << "Function '" << name << "' is already added to the program!\n";
+            throw runtime_error("Function '" + name + "' is already added to the program!");
     }
 }
 
 void Program::compileProgram()
 {
     vector<string> sources;
-    for (int i = 0; i < kernel_files.size(); ++i) {
+    for (int i = 0; i < kernel_files.size(); ++i)
         sources.push_back(kernel_files[i].getSourceCode());
-    }
 
     vector<const char*> c_sources;
     vector<size_t> source_lengths;
 
-    for (int i = 0; i < sources.size(); ++i) {
+    for (int i = 0; i < sources.size(); ++i)
+    {
         c_sources.push_back(sources[i].c_str());
         source_lengths.push_back(sources[i].length());
     }
@@ -63,24 +62,22 @@ void Program::compileProgram()
         throw runtime_error("Failed to create cl_program! Error code: " + to_string(err));
 
     vector<cl_device_id> deviceIds;
-    for (int i = 0; i < devices.size(); ++i) {
+    for (int i = 0; i < devices.size(); ++i)
         deviceIds.push_back(devices[i]->getDeviceId());
-    }
     
     err = clBuildProgram(program, deviceIds.size(), deviceIds.data(), nullptr, nullptr, nullptr);        
     if (err != CL_SUCCESS)
     {
-        for (int i = 0; i < deviceIds.size(); ++i) {
+        for (int i = 0; i < deviceIds.size(); ++i)
+        {
             size_t logSize;
             clGetProgramBuildInfo(program, deviceIds[i], CL_PROGRAM_BUILD_LOG, 0, nullptr, &logSize);
             vector<char> log(logSize);
             clGetProgramBuildInfo(program, deviceIds[i], CL_PROGRAM_BUILD_LOG, logSize, log.data(), nullptr);
-            cerr << "Build log for device " << i << ":\n" << log.data() << '\n';
+            throw runtime_error("Build log for device " + to_string(i) + ":\n" + string(log.data()));
         }
         throw runtime_error("Failed to build OpenCL program for one or more devices!");
     }
-
-    cout << "Program '" << program_name << "' compiled successfully!\n";
 }
 
 cl_program Program::getProgram() const { return program; }

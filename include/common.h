@@ -12,7 +12,10 @@
 #define CL_TARGET_OPENCL_VERSION 300
 #include <CL/cl.h>
 
-#include "kernels/buffer.h"
+#include "utils.h"
+#include "opencl_data/data.h"
+#include "opencl_data/scalar.h"
+#include "opencl_data/buffer.h"
 #include "platform/device.h"
 #include "kernels/kernel_function.h"
 #include "kernels/kernel_file.h"

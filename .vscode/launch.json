@@ -21,6 +21,6 @@
             ],
             "miDebuggerPath": "/usr/bin/gdb",
             "preLaunchTask": "CMake: build"
-        }
+        },
     ]
 }

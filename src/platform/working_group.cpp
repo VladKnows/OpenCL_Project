@@ -4,7 +4,7 @@ using namespace std;
 
 WorkingGroup::WorkingGroup(SelectionMode selectionMode)
 {
-    if(selectionMode == SelectionMode::Automatic)
+    if (selectionMode == SelectionMode::Automatic)
         automaticallySelectPlatforms();
     else
         manuallySelectPlatforms();
@@ -19,37 +19,30 @@ void WorkingGroup::manuallySelectPlatforms()
     cl_uint numPlatforms = 0;
     cl_int err = clGetPlatformIDs(0, nullptr, &numPlatforms);
     if (err != CL_SUCCESS)
-    {
-        cerr << "Failed to get number of platforms. Error: " << err << '\n';
-        return;
-    }
+        throw runtime_error("Failed to get number of platforms. Error: " + err + '\n');
 
     cout << "Number of avalabile OpenCL platforms: " << numPlatforms << '\n';
     if (numPlatforms == 0)
-    {
-        cout << "No OpenCL platforms on this system!" << '\n';
-        return;
-    }
+        throw runtime_error("No OpenCL platforms on this system!\n");
 
     vector<cl_platform_id> platformsIds(numPlatforms);
     err = clGetPlatformIDs(numPlatforms, platformsIds.data(), nullptr);
     if (err != CL_SUCCESS)
-    {
-        cerr << "Failed to get platform IDs. Error: " << err << '\n';
-        return;
-    }
+        throw runtime_error("Failed to get platform IDs. Error: " + err + '\n');
 
     bool selected[numPlatforms];
-    for(int i = 0; i < numPlatforms; ++i)
+    for (int i = 0; i < numPlatforms; ++i)
         selected[i] = 0;
+
     int nrOfSelectedPlatforms = 0;
 
     int choice = 0;
-    while(1)
+    while (1)
     {
         cout << "Select/Deselect platforms index (0 - " << numPlatforms - 1 << "):\n";
 
-        for (cl_uint i = 0; i < numPlatforms; ++i) {
+        for (cl_uint i = 0; i < numPlatforms; ++i)
+        {
             string name;
             
             size_t nameSize = 0;
@@ -66,11 +59,11 @@ void WorkingGroup::manuallySelectPlatforms()
         cout << "\tOr enter " << numPlatforms << " to finish.\n\n";
         cout << "Enter number: ";
 
-        while(1)
+        while (1)
         {
             cin >> choice;
             
-            if(choice < 0 || choice > numPlatforms)
+            if (choice < 0 || choice > numPlatforms)
             {
                 cout << "Number is not in the specified interval.\n";
                 cout << "Enter another number: ";
@@ -79,9 +72,9 @@ void WorkingGroup::manuallySelectPlatforms()
                 break;
         }
 
-        if(choice == numPlatforms)
+        if (choice == numPlatforms)
         {
-            if(nrOfSelectedPlatforms == 0)
+            if (nrOfSelectedPlatforms == 0)
                 cout << "No selected platforms!\n";
             else
                 break;
@@ -93,27 +86,22 @@ void WorkingGroup::manuallySelectPlatforms()
         }
     }
 
-    for (int i = 0; i < numPlatforms; ++i) {
+    for (int i = 0; i < numPlatforms; ++i)
+    {
         if (selected[i])
         {
             cl_uint numDevices = 0;
             cl_int err = clGetDeviceIDs(platformsIds[i], CL_DEVICE_TYPE_ALL, 0, nullptr, &numDevices);
             if (err != CL_SUCCESS || numDevices == 0)
-            {
-                cerr << "No devices found for platform " << i << " or error: " << err << '\n';
-                continue;
-            }
+                throw runtime_error("No devices found for platform " + to_string(i) + " or error: " + to_string(err));
     
             vector<cl_device_id> allDevices(numDevices);
             err = clGetDeviceIDs(platformsIds[i], CL_DEVICE_TYPE_ALL, numDevices, allDevices.data(), nullptr);
             if (err != CL_SUCCESS)
-            {
-                cerr << "Failed to get devices for platform " << i << ". Error: " << err << '\n';
-                continue;
-            }
+                throw runtime_error("Failed to get devices for platform " + to_string(i) + ". Error: " + to_string(err));
             
             bool deviceSelected[numDevices];
-            for(int i = 0; i < numDevices; ++i)
+            for (int i = 0; i < numDevices; ++i)
                 deviceSelected[i] = 0;
             
             int selectedCount = 0;
@@ -152,7 +140,8 @@ void WorkingGroup::manuallySelectPlatforms()
             }
     
             vector<Device> selectedDevices;
-            for (int j = 0; j < numDevices; ++j) {
+            for (int j = 0; j < numDevices; ++j)
+            {
                 if (deviceSelected[j])
                 {
                     size_t nameSize = 0;
@@ -173,6 +162,7 @@ void WorkingGroup::manuallySelectPlatforms()
                     selectedDevices.push_back(dev);
                 }
             }
+
             size_t nameSize = 0;
             clGetPlatformInfo(platformsIds[i], CL_PLATFORM_NAME, 0, nullptr, &nameSize);
             vector<char> nameBuffer(nameSize);
@@ -191,10 +181,7 @@ void WorkingGroup::automaticallySelectPlatforms()
     cl_uint numPlatforms = 0;
     cl_int err = clGetPlatformIDs(0, nullptr, &numPlatforms);
     if (err != CL_SUCCESS || numPlatforms == 0)
-    {
-        cerr << "No OpenCL platforms found. Error: " << err << '\n';
-        return;
-    }
+        throw runtime_error("No OpenCL platforms found. Error: " + err + '\n');
 
     vector<cl_platform_id> platformIds(numPlatforms);
     clGetPlatformIDs(numPlatforms, platformIds.data(), nullptr);
@@ -212,16 +199,14 @@ void WorkingGroup::automaticallySelectPlatforms()
         cl_uint numDevices = 0;
         err = clGetDeviceIDs(platformId, CL_DEVICE_TYPE_ALL, 0, nullptr, &numDevices);
         if (err != CL_SUCCESS || numDevices == 0)
-        {
-            cerr << "No devices found on platform: " << platformName << '\n';
-            continue;
-        }
+            throw runtime_error("No devices found on platform: " + platformName + '\n');
 
         vector<cl_device_id> deviceIds(numDevices);
         clGetDeviceIDs(platformId, CL_DEVICE_TYPE_ALL, numDevices, deviceIds.data(), nullptr);
 
         vector<Device> devices;
-        for (int j = 0; j < numDevices; ++j) {
+        for (int j = 0; j < numDevices; ++j)
+        {
             cl_device_id deviceId = deviceIds[j];
 
             size_t nameSize = 0;
@@ -245,15 +230,16 @@ void WorkingGroup::automaticallySelectPlatforms()
     }
 
     if (platforms.empty())
-        cerr << "No valid platforms with devices were found.\n";
+        throw runtime_error("No valid platforms with devices were found.\n");
     else
-        cout << "Successfully selected " << platforms.size() << " platforms.\n";
+        cout << "Successfully selected " << platforms.size() << " platform(s).\n";
 }
 
 void WorkingGroup::showSelectedPlatformsDevices() const
 {
-    cout << '\n';
-    for (int i = 0; i < platforms.size(); ++i) {
+    cout << '\n' << "The following Platforms and their Devices are in the Working Group:\n";
+    for (int i = 0; i < platforms.size(); ++i)
+    {
         platforms[i].showPlatformInfo();
         platforms[i].showSelectedDevices();
         cout << '\n';
@@ -262,13 +248,13 @@ void WorkingGroup::showSelectedPlatformsDevices() const
 
 void WorkingGroup::createContextAndQueues()
 {
-    for(int i = 0; i < platforms.size(); ++i)
+    for (int i = 0; i < platforms.size(); ++i)
         platforms[i].createContextAndQueues();
 }
 
 pair<int, int> WorkingGroup::selectOneDevice() const
 {
-    if(platforms.empty())
+    if (platforms.empty())
     {
         cerr << "No selected devices!\n";
         return make_pair(-1, -1);
@@ -279,13 +265,13 @@ pair<int, int> WorkingGroup::selectOneDevice() const
     cout << "\nAvalabile Devices:\n";
 
     int count = 0;
-    for(int i = 0; i < platforms.size(); ++i)
+    for (int i = 0; i < platforms.size(); ++i)
     {
         const Platform &pd = platforms[i];
         const vector<Device> &devices = pd.getDevices();
         
         pd.showPlatformInfo();
-        for(int j = 0; j < devices.size(); ++j)
+        for (int j = 0; j < devices.size(); ++j)
         {
             cout << "\t[" << count << "] ";
             devices[j].showDeviceInfo();
@@ -314,7 +300,7 @@ void WorkingGroup::runOnOneDevice(KernelExecutor &executor)
 {
     pair<int, int> platformDeviceIndex;
 
-    if(platforms.size() == 0)
+    if (platforms.size() == 0)
     {
         cout << "No devices were selected!\n";
         return;
@@ -327,20 +313,17 @@ void WorkingGroup::runOnOneDevice(KernelExecutor &executor)
     {
         platformDeviceIndex = selectOneDevice();
 
-        if(platformDeviceIndex.first == -1 || platformDeviceIndex.second == -1)
-        {
-            cerr << "Platform/Device wasn't selected properly!\n";
-            return;
-        }
+        if (platformDeviceIndex.first == -1 || platformDeviceIndex.second == -1)
+            throw runtime_error("Platform/Device wasn't selected properly!\n");
     }
     
     const Platform &p = platforms[platformDeviceIndex.first];
     const Device &d = p.getDevices()[platformDeviceIndex.second];
 
-    cout << "Selected Platform:\n";
-    p.showPlatformInfo();
-    cout << "Selected Device:\n";
-    d.showDeviceInfo();
+    // cout << "Selected Platform and Device:\n";
+    // p.showPlatformInfo();
+    // d.showDeviceInfo();
+    // cout << '\n';
 
     Program& openclProgram = executor.getProgram();
     openclProgram.setContext(p.getContext());

@@ -13,10 +13,7 @@ const vector<Device> &Platform::getDevices() const { return devices; }
 void Platform::createContextAndQueues()
 {
     if (devices.empty())
-    {
-        cerr << "No devices to create context and queues!\n";
-        return;
-    }
+        throw runtime_error("No devices to create context and queues!\n");
 
     vector<cl_device_id> deviceIds;
     for (int i = 0; i < devices.size(); ++i)
@@ -27,12 +24,13 @@ void Platform::createContextAndQueues()
 
     if (err != CL_SUCCESS)
     {
-        cerr << "Failed to create OpenCL context! Error: " << err << '\n';
+        throw runtime_error("Failed to create OpenCL context! Error: " + err + '\n');
         return;
     }
     cout << "Context created successfully.\n";
 
-    for (int i = 0; i < devices.size(); ++i) {
+    for (int i = 0; i < devices.size(); ++i)
+    {
         cout << "Creating command queue for device: " << devices[i].getDeviceName() << '\n';
         devices[i].createCommandQueue(context);
     }
@@ -45,22 +43,21 @@ void Platform::showPlatformInfo() const
 
 void Platform::showSelectedDevices() const
 {
-    for(int i = 0; i < devices.size(); ++i)
+    for (int i = 0; i < devices.size(); ++i)
         devices[i].showDeviceInfo();
 }
 
 void Platform::addCommandToDevice(int deviceIndex, cl_kernel kernel, cl_uint workDim, size_t* globalSize, size_t* localSize)
 {
-    if (deviceIndex < 0 || deviceIndex >= devices.size()) {
-        cerr << "Invalid device index!\n";
-        return;
-    }
+    if (deviceIndex < 0 || deviceIndex >= devices.size())
+        throw runtime_error("Invalid device index!\n");
 
     devices[deviceIndex].addCommandToQueue(kernel, workDim, globalSize, localSize);
 }
 
 Platform::~Platform() {
-    if (context != nullptr) {
+    if (context != nullptr)
+    {
         clReleaseContext(context);
         context = nullptr;
     }

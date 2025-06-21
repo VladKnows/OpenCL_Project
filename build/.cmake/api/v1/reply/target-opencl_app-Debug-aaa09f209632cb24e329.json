@@ -100,7 +100,10 @@
 				5,
 				6,
 				7,
-				8
+				8,
+				9,
+				10,
+				11
 			]
 		}
 	],
@@ -151,18 +154,15 @@
 				5,
 				6,
 				7,
-				8
+				8,
+				9,
+				10,
+				11
 			]
 		}
 	],
 	"sources" : 
 	[
-		{
-			"backtrace" : 2,
-			"compileGroupIndex" : 0,
-			"path" : "src/kernels/buffer.cpp",
-			"sourceGroupIndex" : 0
-		},
 		{
 			"backtrace" : 2,
 			"compileGroupIndex" : 0,
@@ -196,6 +196,24 @@
 		{
 			"backtrace" : 2,
 			"compileGroupIndex" : 0,
+			"path" : "src/opencl_data/buffer.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "src/opencl_data/data.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "src/opencl_data/scalar.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
 			"path" : "src/platform/device.cpp",
 			"sourceGroupIndex" : 0
 		},
@@ -209,6 +227,12 @@
 			"backtrace" : 2,
 			"compileGroupIndex" : 0,
 			"path" : "src/platform/working_group.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "src/utils.cpp",
 			"sourceGroupIndex" : 0
 		}
 	],

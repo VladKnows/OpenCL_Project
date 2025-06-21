@@ -1,4 +1,5 @@
 #include "common.h"
+
 using namespace std;
 
 KernelFunction::KernelFunction(const string &name, size_t global, size_t local)

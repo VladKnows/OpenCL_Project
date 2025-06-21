@@ -1,5 +1,7 @@
 #include "common.h"
 
+using namespace std;
+
 Device::Device(cl_device_id id, const string &type, const string &name)
     : device_id(id), device_type(type), device_name(name) {}
 
@@ -17,33 +19,41 @@ void Device::showDeviceInfo() const
 
 void Device::addCommandToQueue(cl_kernel kernel, cl_uint workDim, size_t *globalSize, size_t *localSize)
 {
-    if(command_queue == nullptr)
+    if (command_queue == nullptr)
     {
-        cerr << "Command queue wasn't created!\n";
+        throw runtime_error("Command queue wasn't created!\n");
         return;
     }
 
-    if(globalSize == nullptr)
+    if (globalSize == nullptr)
     {
-        cerr << "Global size cannot be nullptr!\n";
+        throw runtime_error("Global size cannot be nullptr!\n");
         return;
     }
 
-    if(kernel == nullptr)
+    if (kernel == nullptr)
     {
-        cerr << "Kernel is nullptr!\n";
+        throw runtime_error("Kernel is nullptr!\n");
         return;
     }
 
     const size_t* local = nullptr;
-    if(localSize != nullptr && *localSize > 0)
+    if (localSize != nullptr && *localSize > 0)
         local = localSize;
 
-    cl_int err = clEnqueueNDRangeKernel(command_queue, kernel, workDim, nullptr, globalSize, local, 0, nullptr, nullptr);
+    cl_event event;
+    cl_int err = clEnqueueNDRangeKernel(command_queue, kernel, workDim, nullptr, globalSize, local, 0, nullptr, &event);
     if (err != CL_SUCCESS)
-        cerr << "Failed to enqueue kernel! Error: " << err << '\n';
+        throw runtime_error("Failed to enqueue kernel! Error: " + err + '\n');
 
     clFinish(command_queue);
+
+    cl_ulong start = 0, end = 0;
+    clGetEventProfilingInfo(event, CL_PROFILING_COMMAND_START, sizeof(cl_ulong), &start, nullptr);
+    clGetEventProfilingInfo(event, CL_PROFILING_COMMAND_END, sizeof(cl_ulong), &end, nullptr);
+
+    double elapsed_time_ms = (end - start) * 1e-6;
+    cout << "Execution time: " << elapsed_time_ms << " ms" << "\n\n";
 }
 
 void Device::createCommandQueue(cl_context context)
@@ -53,7 +63,7 @@ void Device::createCommandQueue(cl_context context)
     command_queue = clCreateCommandQueueWithProperties(context, device_id, properties, &err);
     
     if (err != CL_SUCCESS)
-        cerr << "Failed to create command queue for device " << device_name << ". Error: " << err << '\n';
+        throw runtime_error("Failed to create command queue for device " + device_name + ". Error: " + to_string(err));
     else
         cout << "Command queue created for device " << device_name << ".\n";
 }

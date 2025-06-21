@@ -1,10 +1,12 @@
 #include "common.h"
 
-
 using namespace std;
 
 Buffer::Buffer(size_t count, size_t elementSize, Access access, void* hostPtr)
-    : size(count * elementSize), access(access), hostData(hostPtr) {}
+    : size(count * elementSize), access(access), host_data(hostPtr)
+{
+    type = DataType::Buffer;
+}
 
 void Buffer::create(cl_context context)
 {
@@ -23,19 +25,19 @@ void Buffer::create(cl_context context)
             break;
     }
 
-    if (hostData)
+    if (host_data)
         flags |= CL_MEM_COPY_HOST_PTR;
 
-    mem = clCreateBuffer(context, flags, size, hostData, &err);
+    mem = clCreateBuffer(context, flags, size, host_data, &err);
     if (err != CL_SUCCESS)
         throw runtime_error("Failed to create OpenCL buffer! Error code: " + to_string(err));        
 }
 
-cl_mem Buffer::getCLBuffer(const cl_context& context) const
+void Buffer::setKernelArguments(cl_kernel kernel, cl_uint index) const
 {
-    if (!mem)
-        const_cast<Buffer*>(this)->create(context);
-    return mem;
+    cl_int err = clSetKernelArg(kernel, index, sizeof(cl_mem), &mem);
+    if (err != CL_SUCCESS)
+        throw runtime_error("Failed to set Buffer as kernel argument! Error code: " + to_string(err));
 }
 
 Buffer::~Buffer()
