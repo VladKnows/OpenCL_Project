@@ -4,6 +4,11 @@
     "string": "cpp",
     "iostream": "cpp",
     "vector": "cpp",
-    "stdexcept": "cpp"
+    "stdexcept": "cpp",
+    "utility": "cpp",
+    "xutility": "cpp",
+    "xiosbase": "cpp",
+    "algorithm": "cpp",
+    "iterator": "cpp"
   }
 }

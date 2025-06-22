@@ -41,19 +41,21 @@ void Device::addCommandToQueue(cl_kernel kernel, cl_uint workDim, size_t *global
     if (localSize != nullptr && *localSize > 0)
         local = localSize;
 
-    cl_event event;
-    cl_int err = clEnqueueNDRangeKernel(command_queue, kernel, workDim, nullptr, globalSize, local, 0, nullptr, &event);
+    cl_event writeEvent;
+    cl_int err = clEnqueueNDRangeKernel(command_queue, kernel, workDim, nullptr, globalSize, local, 0, nullptr, &writeEvent);
     if (err != CL_SUCCESS)
         throw runtime_error("Failed to enqueue kernel! Error: " + to_string(err) + '\n');
 
     clFinish(command_queue);
 
     cl_ulong start = 0, end = 0;
-    clGetEventProfilingInfo(event, CL_PROFILING_COMMAND_START, sizeof(cl_ulong), &start, nullptr);
-    clGetEventProfilingInfo(event, CL_PROFILING_COMMAND_END, sizeof(cl_ulong), &end, nullptr);
+    clGetEventProfilingInfo(writeEvent, CL_PROFILING_COMMAND_START, sizeof(cl_ulong), &start, nullptr);
+    clGetEventProfilingInfo(writeEvent, CL_PROFILING_COMMAND_END, sizeof(cl_ulong), &end, nullptr);
 
     double elapsed_time_ms = (end - start) * 1e-6;
-    cout << "Execution time: " << elapsed_time_ms << " ms" << "\n\n";
+    cout << "Execution time: " << elapsed_time_ms << " ms\n\n";
+
+    clReleaseEvent(writeEvent);
 }
 
 void Device::createCommandQueue(cl_context context)

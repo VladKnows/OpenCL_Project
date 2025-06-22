@@ -19,6 +19,8 @@ void KernelExecutor::allocateBuffers()
     for (int i = 0; i < execution_list.size(); ++i)
         for (int j = 0; j < execution_list[i].arguments.size(); ++j)
             execution_list[i].arguments[j]->create(context);
+    
+    cout << '\n';
 }
 
 void KernelExecutor::execute()

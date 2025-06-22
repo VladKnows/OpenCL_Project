@@ -28,7 +28,13 @@ void Buffer::create(cl_context context)
     if (host_data)
         flags |= CL_MEM_COPY_HOST_PTR;
 
+    auto start = chrono::high_resolution_clock::now();
     mem = clCreateBuffer(context, flags, size, host_data, &err);
+    auto end = chrono::high_resolution_clock::now();
+    chrono::duration<double, milli> duration = end - start;
+
+    cout << "Copy data in Buffer duration: " << duration.count() << " ms\n";
+
     if (err != CL_SUCCESS)
         throw runtime_error("Failed to create OpenCL buffer! Error code: " + to_string(err));        
 }

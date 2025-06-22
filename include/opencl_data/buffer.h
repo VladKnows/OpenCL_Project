@@ -36,10 +36,23 @@ class Buffer : public Data {
         template<typename T>
         vector<T> readBack(cl_command_queue queue) {
             vector<T> result(size / sizeof(T));
+            
+            cl_event readEvent;
 
-            cl_int err = clEnqueueReadBuffer(queue, mem, CL_TRUE, 0, size, result.data(), 0, nullptr, nullptr);
+            cl_int err = clEnqueueReadBuffer(queue, mem, CL_TRUE, 0, size, result.data(), 0, nullptr, &readEvent);
             if (err != CL_SUCCESS)
                 throw runtime_error("Failed to read buffer! Error code: " + to_string(err));
+
+            clFinish(queue);
+
+            cl_ulong start = 0, end = 0;
+            clGetEventProfilingInfo(readEvent, CL_PROFILING_COMMAND_START, sizeof(cl_ulong), &start, nullptr);
+            clGetEventProfilingInfo(readEvent, CL_PROFILING_COMMAND_END, sizeof(cl_ulong), &end, nullptr);
+
+            double elapsed_time_ms = (end - start) * 1e-6;
+            cout << "Copy data from Buffer duration: " << elapsed_time_ms << " ms\n";
+
+            clReleaseEvent(readEvent);
             
             return result;
         }

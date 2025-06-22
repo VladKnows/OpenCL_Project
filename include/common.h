@@ -9,6 +9,7 @@
 #include <initializer_list>
 #include <stdexcept>
 #include <random>
+#include <chrono>
 
 #define CL_TARGET_OPENCL_VERSION 300
 #include <CL/cl.h>

@@ -2,7 +2,7 @@
 
 using namespace std;
 
-void execute_vector_addition(WorkingGroup &workingGroup)
+void execute_vector_addition_f32(WorkingGroup &workingGroup)
 {
     cout << "Excuting: Vector addition...\n\n";
 
@@ -11,8 +11,11 @@ void execute_vector_addition(WorkingGroup &workingGroup)
 
     // Host memory initialization
     const int N = 1024;
-    vector<float> a_vec(N, 1.0f);
-    vector<float> b_vec(N, 2.0f);
+    Utils::generateRandomMatrixToFile("vector_add_f32", "a.txt", N, 1);
+    Utils::generateRandomMatrixToFile("vector_add_f32", "b.txt", N, 1);
+
+    vector<float> a_vec = Utils::readVectorFromFile<float>("vector_add_f32", "a.txt");
+    vector<float> b_vec = Utils::readVectorFromFile<float>("vector_add_f32", "b.txt");
 
     // KernelFunctions
     vectorAdd.addKernelFunction("vector_add", 1024);
@@ -36,6 +39,52 @@ void execute_vector_addition(WorkingGroup &workingGroup)
 
     // Result
     vector<float> result = c.readBack<float>(program.getDevices()[0]->getCommandQueue());
+    Utils::writeVectorToFile<float>("vector_add_f32", "c.txt", result);
+}
+
+void execute_reduce_f32(WorkingGroup &workingGroup)
+{
+    cout << "Executing: Reduce (sum)...\n\n";
+
+    // KernelFiles
+    KernelFile reduce("reduce.cl");
+
+    // Host memory initialization
+    Utils::generateRandomMatrixToFile("reduce_f32", "in.txt", 4096, 1);
+    vector<float> input = Utils::readVectorFromFile<float>("reduce_f32", "in.txt");
+    const unsigned int N = input.size();
+
+    unsigned int localSize = 256;
+    unsigned int numGroups = (N + localSize - 1) / localSize;
+    unsigned int globalSize = numGroups * localSize;
+
+    // KernelFunctions
+    reduce.addKernelFunction("reduce_f32_stage1", globalSize, localSize);
+    reduce.addKernelFunction("reduce_f32_stage2", localSize, localSize);
+
+    // Program initialization
+    Program program("Reduce");
+    program.addKernelFunctions(reduce);
+
+    // OpenCL Data - Buffers and Scalar
+    Buffer inputBuf = Buffer::fromValues<float>(input, Access::ReadOnly);
+    Buffer partialBuf = Buffer::empty<float>(numGroups, Access::ReadWrite);
+    Buffer outputBuf = Buffer::empty<float>(1, Access::ReadWrite);
+
+    Scalar N_scalar = Scalar::fromValue<unsigned int>(N);
+    Scalar G_scalar = Scalar::fromValue<unsigned int>(numGroups);
+
+    // KernelExecutor - program flow
+    KernelExecutor executor(program);
+    executor.addKernelCall("reduce_f32_stage1", {&inputBuf, &partialBuf, &N_scalar});
+    executor.addKernelCall("reduce_f32_stage2", {&partialBuf, &outputBuf, &G_scalar});
+
+    // Running
+    workingGroup.runOnOneDevice(executor);
+
+    // Result
+    vector<float> result = outputBuf.readBack<float>(program.getDevices()[0]->getCommandQueue());
+    Utils::writeVectorToFile<float>("reduce_f32", "out.txt", result);
 }
 
 void execute_fir_f32(WorkingGroup &workingGroup)
@@ -46,6 +95,9 @@ void execute_fir_f32(WorkingGroup &workingGroup)
     KernelFile fir("fir.cl");
 
     // Host memory initialization
+    Utils::generateRandomMatrixToFile("fir_f32", "in.txt", 384, 1);
+    Utils::generateRandomMatrixToFile("fir_f32", "coeff.txt", 256, 1);
+
     vector<float> input = Utils::readVectorFromFile<float>("fir_f32", "in.txt");
     vector<float> coeffs = Utils::readVectorFromFile<float>("fir_f32", "coeff.txt");
 
@@ -63,7 +115,6 @@ void execute_fir_f32(WorkingGroup &workingGroup)
     program.addKernelFunctions(fir);
 
     // OpenCL Data - Buffers and Scalar
-    Buffer inputBuf = Buffer::fromValues<float>(input, Access::ReadOnly);
     Buffer coeffsBuf = Buffer::fromValues<float>(coeffs, Access::ReadOnly);
     Buffer stateBuf = Buffer::fromValues<float>(state, Access::ReadOnly);
     Buffer outputBuf = Buffer::empty<float>(blockSize, Access::ReadWrite);
@@ -73,7 +124,7 @@ void execute_fir_f32(WorkingGroup &workingGroup)
 
     // KernelExecutor - program flow
     KernelExecutor executor(program);
-    executor.addKernelCall("fir_f32", {&inputBuf, &coeffsBuf, &stateBuf, &outputBuf, &numTapsScalar, &blockSizeScalar});
+    executor.addKernelCall("fir_f32", {&coeffsBuf, &stateBuf, &outputBuf, &numTapsScalar, &blockSizeScalar});
 
     // Running
     workingGroup.runOnOneDevice(executor);
@@ -91,11 +142,13 @@ void execute_dct4_f32(WorkingGroup &workingGroup)
     KernelFile dct("dct4.cl");
 
     // Host memory initialization
+    Utils::generateRandomMatrixToFile("dct4_f32", "in.txt", 2048, 1);
+
     vector<float> input = Utils::readVectorFromFile<float>("dct4_f32", "in.txt");
     const unsigned int N = input.size();
 
     // KernelFunctions
-    dct.addKernelFunction("dct4_f32", N);
+    dct.addKernelFunction("dct4_f32", 2, {N, N}, {256, 1});
 
     // Program initialization
     Program program("DCT4Transform");
@@ -129,8 +182,8 @@ void execute_matrix_multiplication_f32(WorkingGroup &workingGroup)
     unsigned int M, N, P;
     unsigned int rowsA, colsA, rowsB, colsB;
 
-    Utils::generateRandomMatrixToFile("matrix_multiplication_f32", "A.txt", 1000, 1500);
-    Utils::generateRandomMatrixToFile("matrix_multiplication_f32", "B.txt", 1500, 1200);
+    Utils::generateRandomMatrixToFile("matrix_multiplication_f32", "A.txt", 256, 512);
+    Utils::generateRandomMatrixToFile("matrix_multiplication_f32", "B.txt", 512, 128);
 
     vector<float> A = Utils::readMatrixFromFile<float>("matrix_multiplication_f32", "A.txt", rowsA, colsA);
     vector<float> B = Utils::readMatrixFromFile<float>("matrix_multiplication_f32", "B.txt", rowsB, colsB);
@@ -176,13 +229,15 @@ void execute_matrix_multiplication_f32(WorkingGroup &workingGroup)
 
 int main()
 {
-    //WorkingGroup initialization
+    // WorkingGroup initialization
     WorkingGroup workingGroup(SelectionMode::Manual);
     workingGroup.showSelectedPlatformsDevices();
 
-    //Executing user defined functions
+    // Executing user defined functions
     cout << "=====================================================\n";
-    execute_vector_addition(workingGroup);
+    execute_vector_addition_f32(workingGroup);
+    cout << "=====================================================\n";
+    execute_reduce_f32(workingGroup);
     cout << "=====================================================\n";
     execute_fir_f32(workingGroup);
     cout << "=====================================================\n";
