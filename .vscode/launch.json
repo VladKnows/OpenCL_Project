@@ -5,7 +5,7 @@
             "name": "Linux: Run",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/opencl_app",
+            "program": "${workspaceFolder}/build/linux/opencl_app",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",

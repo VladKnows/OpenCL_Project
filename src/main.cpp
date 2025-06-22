@@ -39,10 +39,6 @@ void execute_2vector_additions(WorkingGroup &workingGroup)
 
     // Result
     vector<float> result = c.readBack<float>(program.getDevices()[0]->getCommandQueue());
-    cout << "Result: ";
-    for (int i = 0; i < 10; ++i)
-        cout << result[i] << ' ';
-    cout << "\n\n";
 }
 
 void execute_fir_f32(WorkingGroup &workingGroup)
@@ -132,9 +128,13 @@ int main()
     workingGroup.showSelectedPlatformsDevices();
 
     //Executing user defined functions
+    cout << "====================================================================== ";
     execute_2vector_additions(workingGroup);
+    cout << "====================================================================== ";
     execute_fir_f32(workingGroup);
+    cout << "====================================================================== ";
     execute_dct4_f32(workingGroup);
+    cout << "====================================================================== ";
 
     return 0;
 }
