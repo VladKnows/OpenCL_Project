@@ -4,7 +4,7 @@ using namespace std;
 
 void execute_vector_addition(WorkingGroup &workingGroup)
 {
-    cout << "Excuting: 2 vector additions...\n\n";
+    cout << "Excuting: Vector addition...\n\n";
 
     // KernelFiles
     KernelFile vectorAdd("vector_add.cl");
