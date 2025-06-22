@@ -1,2 +1,1 @@
-Device -> addCommandToQueue (and all else related)
 WorkingGroup -> runOnOneDevice (also add for multiple devices)

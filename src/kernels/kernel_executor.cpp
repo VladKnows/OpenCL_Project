@@ -33,30 +33,23 @@ void KernelExecutor::execute()
         const string &funcName = execution_list[i].functionName;
         const vector<Data*> &args = execution_list[i].arguments;
 
-        size_t globalSize = 0, localSize = 0;
-        bool found = false;
+        const KernelFunction* matchedFunc = nullptr;
         for (int j = 0; j < functions.size(); ++j)
         {
             if (functions[j].getFunctionName() == funcName)
             {
-                globalSize = functions[j].getGlobalSize();
-                localSize = functions[j].getLocalSize();
-                found = true;
+                matchedFunc = &functions[j];
                 break;
             }
         }
 
-        if (!found)
-        {
-            throw runtime_error("Function " + funcName + " not found in program!\n");
-        }
+        if (!matchedFunc)
+            throw runtime_error("Function " + funcName + " not found in program!");
 
         cl_int err;
         cl_kernel kernel = clCreateKernel(clProg, funcName.c_str(), &err);
         if (err != CL_SUCCESS)
-        {
             throw runtime_error("Failed to create kernel: " + funcName + ". Error code: " + to_string(err));
-        }
 
         for (int k = 0; k < args.size(); ++k)
         {
@@ -68,13 +61,19 @@ void KernelExecutor::execute()
             {
                 throw runtime_error("Kernel argument error at index " + to_string(k) + ": " + e.what());
                 clReleaseKernel(kernel);
-                continue;
             }
         }
 
         cout << "Kernel: " << funcName << '\n';
-        const size_t *localPtr = (localSize > 0 ? &localSize : nullptr);
-        device->addCommandToQueue(kernel, 1, &globalSize, const_cast<size_t *>(localPtr));
+        
+        const vector<size_t> &globalSize = matchedFunc->getGlobalSize();
+        const vector<size_t> &localSize = matchedFunc->getLocalSize();
+        unsigned int workDim = matchedFunc->getWorkDim();
+
+        const size_t* globalPtr = globalSize.data();
+        const size_t* localPtr = (localSize.size() == globalSize.size()) ? localSize.data() : nullptr;
+
+        device->addCommandToQueue(kernel, workDim, const_cast<size_t*>(globalPtr), const_cast<size_t*>(localPtr));
 
         clReleaseKernel(kernel);
     }

@@ -49,6 +49,21 @@ void KernelFile::addKernelFunction(const string &functionName, size_t globalSize
     functions.push_back(KernelFunction(functionName, globalSize, localSize));
 }
 
+void KernelFile::addKernelFunction(const string &functionName, unsigned int workDim, const vector<size_t> &globalSize, const vector<size_t> &localSize)
+{
+    if (!kernelFunctionExists(functionName))
+        throw runtime_error("Kernel function '" + functionName + "' not found in file '" + file_name + "'");
+
+    for (int i = 0; i < functions.size(); ++i)
+    {
+        if (functions[i].getFunctionName() == functionName)
+            throw runtime_error("Kernel function '" + functionName + "' already added.");
+    }
+
+    functions.push_back(KernelFunction(functionName, workDim, globalSize, localSize));
+}
+
+
 const string &KernelFile::getSourceCode() const { return source_code; }
 const string &KernelFile::getFileName() const { return file_name; }
 const vector<KernelFunction>& KernelFile::getKernelFunctions() const { return functions; }

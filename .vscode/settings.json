@@ -1,6 +1,9 @@
 {
   "cmake.useCMakePresets": "always",
   "files.associations": {
-    "string": "cpp"
+    "string": "cpp",
+    "iostream": "cpp",
+    "vector": "cpp",
+    "stdexcept": "cpp"
   }
 }

@@ -2,7 +2,7 @@
 
 using namespace std;
 
-void execute_2vector_additions(WorkingGroup &workingGroup)
+void execute_vector_addition(WorkingGroup &workingGroup)
 {
     cout << "Excuting: 2 vector additions...\n\n";
 
@@ -13,10 +13,9 @@ void execute_2vector_additions(WorkingGroup &workingGroup)
     const int N = 1024;
     vector<float> a_vec(N, 1.0f);
     vector<float> b_vec(N, 2.0f);
-    vector<float> d_vec(N, 5.0f);
 
     // KernelFunctions
-    vectorAdd.addKernelFunction("vector_add", 1024, 64);
+    vectorAdd.addKernelFunction("vector_add", 1024);
 
     // Program initialization
     Program program("VectorOps");
@@ -26,13 +25,11 @@ void execute_2vector_additions(WorkingGroup &workingGroup)
     Buffer a = Buffer::fromValues<float>(a_vec, Access::ReadOnly);
     Buffer b = Buffer::fromValues<float>(b_vec, Access::ReadOnly);
     Buffer c = Buffer::empty<float>(N, Access::ReadWrite);
-    Buffer d = Buffer::fromValues<float>(d_vec, Access::ReadOnly);
     Scalar n = Scalar::fromValue<unsigned int>(N);
 
     // KernelExecutor - program flow
     KernelExecutor executor(program);
     executor.addKernelCall("vector_add", {&a, &b, &c, &n});
-    executor.addKernelCall("vector_add", {&c, &d, &c, &n});
 
     // Running
     workingGroup.runOnOneDevice(executor);
@@ -59,7 +56,7 @@ void execute_fir_f32(WorkingGroup &workingGroup)
     state.insert(state.end(), input.begin(), input.end());
     
     // KernelFunctions
-    fir.addKernelFunction("fir_f32", blockSize, 0);
+    fir.addKernelFunction("fir_f32", blockSize);
 
     // Program initialization
     Program program("FirFilter");
@@ -98,7 +95,7 @@ void execute_dct4_f32(WorkingGroup &workingGroup)
     const unsigned int N = input.size();
 
     // KernelFunctions
-    dct.addKernelFunction("dct4_f32", N, 0);
+    dct.addKernelFunction("dct4_f32", N);
 
     // Program initialization
     Program program("DCT4Transform");
@@ -121,6 +118,59 @@ void execute_dct4_f32(WorkingGroup &workingGroup)
     Utils::writeVectorToFile<float>("dct4_f32", "out.txt", result);
 }
 
+void execute_matrix_multiplication_f32(WorkingGroup &workingGroup)
+{
+    cout << "Executing: Matrix Multiplication on 32-bit float elements...\n\n";
+
+    // KernelFiles
+    KernelFile matmul("matrix_multiplication.cl");
+
+    // Host memory initialization
+    unsigned int M, N, P;
+    unsigned int rowsA, colsA, rowsB, colsB;
+
+    vector<float> A = Utils::readMatrixFromFile<float>("matrix_multiplication_f32", "A.txt", rowsA, colsA);
+    vector<float> B = Utils::readMatrixFromFile<float>("matrix_multiplication_f32", "B.txt", rowsB, colsB);
+
+    if (colsA != rowsB)
+        throw runtime_error("Matrix dimensions incompatible for multiplication");
+
+    M = rowsA;
+    N = colsA;
+    P = colsB;
+
+    vector<float> C(M * P, 0.0f);
+
+    // KernelFunctions
+    matmul.addKernelFunction("matrix_multiplication_f32", 2, {M, P});
+
+    // Program initialization
+    Program program("MatrixMultiplication");
+    program.addKernelFunctions(matmul);
+
+    // OpenCL Data - Buffers and Scalars
+    Buffer aBuf = Buffer::fromValues<float>(A, Access::ReadOnly);
+    Buffer bBuf = Buffer::fromValues<float>(B, Access::ReadOnly);
+    Buffer cBuf = Buffer::fromValues<float>(C, Access::ReadWrite);
+
+    Scalar mScalar = Scalar::fromValue<unsigned int>(M);
+    Scalar nScalar = Scalar::fromValue<unsigned int>(N);
+    Scalar pScalar = Scalar::fromValue<unsigned int>(P);
+
+    // KernelExecutor - program flow
+    KernelExecutor executor(program);
+    executor.addKernelCall("matrix_multiplication_f32", {&aBuf, &bBuf, &cBuf, &mScalar, &nScalar, &pScalar});
+
+    // Running
+    workingGroup.runOnOneDevice(executor);
+
+    // Result
+    vector<float> result = cBuf.readBack<float>(program.getDevices()[0]->getCommandQueue());
+
+    // Optional output
+    Utils::writeVectorToFile<float>("matrix_multiplication_f32", "out.txt", result);
+}
+
 int main()
 {
     //WorkingGroup initialization
@@ -128,13 +178,15 @@ int main()
     workingGroup.showSelectedPlatformsDevices();
 
     //Executing user defined functions
-    cout << "======================================================================\n";
-    execute_2vector_additions(workingGroup);
-    cout << "======================================================================\n";
+    cout << "=====================================================\n";
+    execute_vector_addition(workingGroup);
+    cout << "=====================================================\n";
     execute_fir_f32(workingGroup);
-    cout << "======================================================================\n";
+    cout << "=====================================================\n";
     execute_dct4_f32(workingGroup);
-    cout << "======================================================================\n";
+    cout << "=====================================================\n";
+    execute_matrix_multiplication_f32(workingGroup);
+    cout << "=====================================================\n";
 
     return 0;
 }

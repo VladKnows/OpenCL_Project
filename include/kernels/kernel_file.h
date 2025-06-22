@@ -16,6 +16,7 @@ class KernelFile {
         KernelFile(const string &file);
 
         void addKernelFunction(const string &functionName, size_t globalSize, size_t localSize = 0);
+        void addKernelFunction(const string &functionName, unsigned int workDim, const vector<size_t> &globalSize, const vector<size_t> &localSize = {});
 
         const string &getSourceCode() const;
         const string &getFileName() const;

@@ -37,4 +37,42 @@ class Utils {
             if (!out)
                 throw runtime_error("Error: failed while writing to file '" + fullPath + "'!\n");
         }
+
+        template <typename T>
+        static vector<T> readMatrixFromFile(const string &parentFolder, const string &filename, unsigned int &rows, unsigned int &cols)
+        {
+            string fullPath = "data/" + parentFolder + "/" + filename;
+            ifstream in(fullPath);
+            if (!in.is_open())
+                throw runtime_error("Could not open file: " + fullPath);
+
+            vector<T> data;
+            string line;
+            rows = 0;
+            cols = 0;
+
+            while (getline(in, line))
+            {
+                istringstream iss(line);
+                T value;
+                unsigned int currentCols = 0;
+                while (iss >> value)
+                {
+                    data.push_back(value);
+                    ++currentCols;
+                }
+
+                if (rows == 0)
+                    cols = currentCols;
+                else if (currentCols != cols)
+                    throw runtime_error("Inconsistent number of columns in file: " + fullPath);
+
+                ++rows;
+            }
+
+            if (data.empty())
+                throw runtime_error("File is empty or invalid format: " + fullPath);
+
+            return data;
+        }
 };
