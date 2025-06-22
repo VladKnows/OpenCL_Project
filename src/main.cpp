@@ -4,7 +4,7 @@ using namespace std;
 
 void execute_2vector_additions(WorkingGroup &workingGroup)
 {
-    cout << "Excuting: 2 vector additions...\n";
+    cout << "Excuting: 2 vector additions...\n\n";
 
     // KernelFiles
     KernelFile vectorAdd("vector_add.cl");
@@ -43,7 +43,7 @@ void execute_2vector_additions(WorkingGroup &workingGroup)
 
 void execute_fir_f32(WorkingGroup &workingGroup)
 {
-    cout << "Excuting: FIR on 32 bits elements...\n";
+    cout << "Excuting: FIR on 32 bits elements...\n\n";
 
     // KernelFiles
     KernelFile fir("fir.cl");
@@ -88,7 +88,7 @@ void execute_fir_f32(WorkingGroup &workingGroup)
 
 void execute_dct4_f32(WorkingGroup &workingGroup)
 {
-    cout << "Executing: DCT4 on 32-bit float elements...\n";
+    cout << "Executing: DCT4 on 32-bit float elements...\n\n";
 
     // KernelFiles
     KernelFile dct("dct4.cl");
@@ -128,13 +128,13 @@ int main()
     workingGroup.showSelectedPlatformsDevices();
 
     //Executing user defined functions
-    cout << "====================================================================== ";
+    cout << "======================================================================\n";
     execute_2vector_additions(workingGroup);
-    cout << "====================================================================== ";
+    cout << "======================================================================\n";
     execute_fir_f32(workingGroup);
-    cout << "====================================================================== ";
+    cout << "======================================================================\n";
     execute_dct4_f32(workingGroup);
-    cout << "====================================================================== ";
+    cout << "======================================================================\n";
 
     return 0;
 }

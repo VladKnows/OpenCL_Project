@@ -1,2 +1,5 @@
 # Build
 build/
+
+# Output files
+/data/*/out.txt
