@@ -19,7 +19,7 @@ void WorkingGroup::manuallySelectPlatforms()
     cl_uint numPlatforms = 0;
     cl_int err = clGetPlatformIDs(0, nullptr, &numPlatforms);
     if (err != CL_SUCCESS)
-        throw runtime_error("Failed to get number of platforms. Error: " + err + '\n');
+        throw runtime_error("Failed to get number of platforms. Error: " + to_string(err) + '\n');
 
     cout << "Number of avalabile OpenCL platforms: " << numPlatforms << '\n';
     if (numPlatforms == 0)
@@ -28,7 +28,7 @@ void WorkingGroup::manuallySelectPlatforms()
     vector<cl_platform_id> platformsIds(numPlatforms);
     err = clGetPlatformIDs(numPlatforms, platformsIds.data(), nullptr);
     if (err != CL_SUCCESS)
-        throw runtime_error("Failed to get platform IDs. Error: " + err + '\n');
+        throw runtime_error("Failed to get platform IDs. Error: " + to_string(err) + '\n');
 
     bool selected[numPlatforms];
     for (int i = 0; i < numPlatforms; ++i)
@@ -181,7 +181,7 @@ void WorkingGroup::automaticallySelectPlatforms()
     cl_uint numPlatforms = 0;
     cl_int err = clGetPlatformIDs(0, nullptr, &numPlatforms);
     if (err != CL_SUCCESS || numPlatforms == 0)
-        throw runtime_error("No OpenCL platforms found. Error: " + err + '\n');
+        throw runtime_error("No OpenCL platforms found. Error: " + to_string(err) + '\n');
 
     vector<cl_platform_id> platformIds(numPlatforms);
     clGetPlatformIDs(numPlatforms, platformIds.data(), nullptr);

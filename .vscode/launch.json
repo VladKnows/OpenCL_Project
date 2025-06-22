@@ -2,7 +2,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "OpenCL: Run",
+            "name": "Linux: Run",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/build/opencl_app",
@@ -22,5 +22,17 @@
             "miDebuggerPath": "/usr/bin/gdb",
             "preLaunchTask": "CMake: build"
         },
+        {
+            "name": "Windows: Run",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/windows/opencl_app.exe",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": true,
+            "preLaunchTask": "CMake: build"
+        }
     ]
 }

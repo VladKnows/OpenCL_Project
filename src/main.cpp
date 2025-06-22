@@ -128,7 +128,7 @@ void execute_dct4_f32(WorkingGroup &workingGroup)
 int main()
 {
     //WorkingGroup initialization
-    WorkingGroup workingGroup(SelectionMode::Automatic);
+    WorkingGroup workingGroup(SelectionMode::Manual);
     workingGroup.showSelectedPlatformsDevices();
 
     //Executing user defined functions

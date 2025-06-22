@@ -44,7 +44,7 @@ void Device::addCommandToQueue(cl_kernel kernel, cl_uint workDim, size_t *global
     cl_event event;
     cl_int err = clEnqueueNDRangeKernel(command_queue, kernel, workDim, nullptr, globalSize, local, 0, nullptr, &event);
     if (err != CL_SUCCESS)
-        throw runtime_error("Failed to enqueue kernel! Error: " + err + '\n');
+        throw runtime_error("Failed to enqueue kernel! Error: " + to_string(err) + '\n');
 
     clFinish(command_queue);
 

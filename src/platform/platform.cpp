@@ -24,7 +24,7 @@ void Platform::createContextAndQueues()
 
     if (err != CL_SUCCESS)
     {
-        throw runtime_error("Failed to create OpenCL context! Error: " + err + '\n');
+        throw runtime_error("Failed to create OpenCL context! Error: " + to_string(err) + '\n');
         return;
     }
     cout << "Context created successfully.\n";
