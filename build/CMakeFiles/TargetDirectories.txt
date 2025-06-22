@@ -1,3 +1,0 @@
-/home/radxa/Projects/OpenCL_Test/build/CMakeFiles/opencl_app.dir
-/home/radxa/Projects/OpenCL_Test/build/CMakeFiles/edit_cache.dir
-/home/radxa/Projects/OpenCL_Test/build/CMakeFiles/rebuild_cache.dir

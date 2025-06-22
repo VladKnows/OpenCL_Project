@@ -1,3 +1,0 @@
-D:/DRIVE/.Everything Important/FACULTATE/Licenta/Proiect/OpenCL_Project/build/windows/CMakeFiles/opencl_app.dir
-D:/DRIVE/.Everything Important/FACULTATE/Licenta/Proiect/OpenCL_Project/build/windows/CMakeFiles/edit_cache.dir
-D:/DRIVE/.Everything Important/FACULTATE/Licenta/Proiect/OpenCL_Project/build/windows/CMakeFiles/rebuild_cache.dir
