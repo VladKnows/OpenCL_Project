@@ -18,7 +18,7 @@ void execute_vector_addition_f32(WorkingGroup &workingGroup)
     vector<float> b_vec = Utils::readVectorFromFile<float>("vector_add_f32", "b.txt");
 
     // KernelFunctions
-    vectorAdd.addKernelFunction("vector_add", 1024);
+    vectorAdd.addKernelFunction("vector_add_f32", 1024);
 
     // Program initialization
     Program program("VectorOps");
@@ -32,7 +32,7 @@ void execute_vector_addition_f32(WorkingGroup &workingGroup)
 
     // KernelExecutor - program flow
     KernelExecutor executor(program);
-    executor.addKernelCall("vector_add", {&a, &b, &c, &n});
+    executor.addKernelCall("vector_add_f32", {&a, &b, &c, &n});
 
     // Running
     workingGroup.runOnOneDevice(executor);
