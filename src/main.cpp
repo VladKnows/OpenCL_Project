@@ -129,6 +129,9 @@ void execute_matrix_multiplication_f32(WorkingGroup &workingGroup)
     unsigned int M, N, P;
     unsigned int rowsA, colsA, rowsB, colsB;
 
+    Utils::generateRandomMatrixToFile("matrix_multiplication_f32", "A.txt", 1000, 1500);
+    Utils::generateRandomMatrixToFile("matrix_multiplication_f32", "B.txt", 1500, 1200);
+
     vector<float> A = Utils::readMatrixFromFile<float>("matrix_multiplication_f32", "A.txt", rowsA, colsA);
     vector<float> B = Utils::readMatrixFromFile<float>("matrix_multiplication_f32", "B.txt", rowsB, colsB);
 

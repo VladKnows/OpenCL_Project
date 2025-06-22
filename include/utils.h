@@ -75,4 +75,6 @@ class Utils {
 
             return data;
         }
+
+        static void generateRandomMatrixToFile(const string& folder, const string& filename, int rows, int cols);
 };
