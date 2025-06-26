@@ -23,7 +23,7 @@ void KernelExecutor::allocateBuffers()
     cout << '\n';
 }
 
-void KernelExecutor::execute()
+void KernelExecutor::execute_one_device()
 {
     cl_context context = program.getContext();
     cl_program clProg = program.getProgram();

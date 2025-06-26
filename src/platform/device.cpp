@@ -12,8 +12,7 @@ const cl_command_queue &Device::getCommandQueue() const { return command_queue; 
 
 void Device::showDeviceInfo() const
 {
-    cout << "\tDevice #" << device_id
-            << ": " << device_name
+    cout << "\tDevice: " << device_name
             << " [" << device_type << "]\n";
 }
 

@@ -1,9 +1,6 @@
 #include "common.h"
 
-Scalar::Scalar(void* valuePtr, size_t size) : data(valuePtr), size(size) 
-{
-    type = DataType::Scalar;
-}
+Scalar::Scalar(void* valuePtr, size_t size) : data(valuePtr), size(size) {}
 
 void Scalar::setKernelArguments(cl_kernel kernel, cl_uint index) const
 {

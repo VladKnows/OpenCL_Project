@@ -3,10 +3,7 @@
 using namespace std;
 
 Buffer::Buffer(size_t count, size_t elementSize, Access access, void* hostPtr)
-    : size(count * elementSize), access(access), host_data(hostPtr)
-{
-    type = DataType::Buffer;
-}
+    : size(count * elementSize), access(access), host_data(hostPtr) {}
 
 void Buffer::create(cl_context context)
 {

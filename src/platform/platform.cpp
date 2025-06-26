@@ -38,7 +38,7 @@ void Platform::createContextAndQueues()
 
 void Platform::showPlatformInfo() const
 {
-    cout << "Platform #" << platform_id << ": " << platform_name << '\n';
+    cout << "Platform: " << platform_name << '\n';
 }
 
 void Platform::showSelectedDevices() const

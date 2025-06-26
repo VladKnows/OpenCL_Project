@@ -334,5 +334,5 @@ void WorkingGroup::runOnOneDevice(KernelExecutor &executor)
     openclProgram.compileProgram();
 
     executor.allocateBuffers();
-    executor.execute();
+    executor.execute_one_device();
 }

@@ -6,7 +6,7 @@ KernelFunction::KernelFunction(const string &name, unsigned int workDim, const v
     : function_name(name), global_size(globalSizes), local_size(localSizes), workDim(workDim)
 {
     if (global_size.size() != workDim)
-        throw runtime_error("Global size vector size must match workDim.");
+        throw runtime_error("Global size vector size must match workDim!\n");
 }
 
 KernelFunction::KernelFunction(const string &name, size_t globalSize, size_t localSize)

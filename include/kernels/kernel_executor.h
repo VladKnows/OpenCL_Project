@@ -20,5 +20,5 @@ class KernelExecutor {
         
         void addKernelCall(const string &functionName, const vector<Data*> &args);
         void allocateBuffers();
-        void execute();
+        void execute_one_device();
 };

@@ -10,7 +10,7 @@ void execute_vector_addition_f32(WorkingGroup &workingGroup)
     KernelFile vectorAdd("vector_add.cl");
 
     // Host memory initialization
-    const int N = 1024;
+    const int N = 4096;
     Utils::generateRandomMatrixToFile("vector_add_f32", "a.txt", N, 1);
     Utils::generateRandomMatrixToFile("vector_add_f32", "b.txt", N, 1);
 
@@ -18,7 +18,7 @@ void execute_vector_addition_f32(WorkingGroup &workingGroup)
     vector<float> b_vec = Utils::readVectorFromFile<float>("vector_add_f32", "b.txt");
 
     // KernelFunctions
-    vectorAdd.addKernelFunction("vector_add_f32", 1024);
+    vectorAdd.addKernelFunction("vector_add_f32", 409);
 
     // Program initialization
     Program program("VectorOps");
