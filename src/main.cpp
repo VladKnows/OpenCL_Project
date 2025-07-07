@@ -148,7 +148,7 @@ void execute_dct4_f32(WorkingGroup &workingGroup)
     const unsigned int N = input.size();
 
     // KernelFunctions
-    dct.addKernelFunction("dct4_f32", 2, {N, N}, {256, 1});
+    dct.addKernelFunction("dct4_f32", 2, {256, N}, {256, 1});
 
     // Program initialization
     Program program("DCT4Transform");

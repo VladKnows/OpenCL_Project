@@ -3,26 +3,30 @@ __kernel void dct4_f32(
     __global float* output,
     const uint N)
 {
-    const int n = get_local_id(0);
+    const int lid = get_local_id(0);
     const int k = get_global_id(1);
     const int local_size = get_local_size(0);
 
-    __local float partial_sums[256];
-
+    __local float local_sum[256];
+    float sum = 0.0f;
     float factor = M_PI_F / (float)N;
-    float angle = factor * (n + 0.5f) * (k + 0.5f);
-    float contrib = input[n] * cos(angle);
-    partial_sums[n] = contrib;
 
+    for (int n = lid; n < N; n += local_size)
+    {
+        float angle = factor * (n + 0.5f) * (k + 0.5f);
+        sum += input[n] * cos(angle);
+    }
+
+    local_sum[lid] = sum;
     barrier(CLK_LOCAL_MEM_FENCE);
 
     for (int stride = local_size / 2; stride > 0; stride /= 2)
     {
-        if (n < stride)
-            partial_sums[n] += partial_sums[n + stride];
+        if (lid < stride)
+            local_sum[lid] += local_sum[lid + stride];
         barrier(CLK_LOCAL_MEM_FENCE);
     }
 
-    if (n == 0)
-        output[k] = partial_sums[0] * sqrt(2.0f / (float)N);
+    if (lid == 0)
+        output[k] = local_sum[0] * sqrt(2.0f / (float)N);
 }
