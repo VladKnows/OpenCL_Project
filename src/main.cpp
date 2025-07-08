@@ -117,7 +117,7 @@ void execute_fir_f32(WorkingGroup &workingGroup)
     // OpenCL Data - Buffers and Scalar
     Buffer coeffsBuf = Buffer::fromValues<float>(coeffs, Access::ReadOnly);
     Buffer stateBuf = Buffer::fromValues<float>(state, Access::ReadOnly);
-    Buffer outputBuf = Buffer::empty<float>(blockSize, Access::ReadWrite);
+    Buffer outputBuf = Buffer::empty<float>(blockSize - numTaps + 1, Access::ReadWrite);
 
     Scalar numTapsScalar = Scalar::fromValue<unsigned int>(numTaps);
     Scalar blockSizeScalar = Scalar::fromValue<unsigned int>(blockSize);

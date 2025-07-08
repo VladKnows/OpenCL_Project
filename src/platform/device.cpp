@@ -2,6 +2,9 @@
 
 using namespace std;
 
+#define CL_DEVICE_PCI_BUS_ID_NV 0x4008
+#define CL_DEVICE_PCI_SLOT_ID_NV 0x4009
+
 Device::Device(cl_device_id id, const string &type, const string &name)
     : device_id(id), device_type(type), device_name(name) {}
 
@@ -14,6 +17,29 @@ void Device::showDeviceInfo() const
 {
     cout << "\tDevice: " << device_name
             << " [" << device_type << "]\n";
+
+    size_t max_work_group_size;
+    clGetDeviceInfo(device_id, CL_DEVICE_MAX_WORK_GROUP_SIZE, sizeof(size_t), &max_work_group_size, nullptr);
+
+    cl_uint compute_units;
+    clGetDeviceInfo(device_id, CL_DEVICE_MAX_COMPUTE_UNITS, sizeof(cl_uint), &compute_units, nullptr);
+
+    size_t max_work_item_sizes[3];
+    clGetDeviceInfo(device_id, CL_DEVICE_MAX_WORK_ITEM_SIZES, sizeof(max_work_item_sizes), max_work_item_sizes, nullptr);
+
+    cl_bool image_support;
+    clGetDeviceInfo(device_id, CL_DEVICE_IMAGE_SUPPORT, sizeof(cl_bool), &image_support, nullptr);    
+
+    cout << "\tCompute Units: " << compute_units << '\n';
+    cout << "\tMax Work-Group Size: " << max_work_group_size << '\n';
+    cout << "\tMax Work-Item Sizes: [" << max_work_item_sizes[0] << ", " << max_work_item_sizes[1] << ", " << max_work_item_sizes[2] << "]\n";
+
+    cout << "\tImage Support: ";
+    if (image_support)
+        cout << "Yes";
+    else
+        cout << "No";
+    cout << '\n';
 }
 
 void Device::addCommandToQueue(cl_kernel kernel, cl_uint workDim, size_t *globalSize, size_t *localSize)

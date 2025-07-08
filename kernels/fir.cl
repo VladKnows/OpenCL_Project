@@ -7,7 +7,7 @@ __kernel void fir_f32(
 )
 {
     int gid = get_global_id(0);
-    if (gid >= blockSize)
+    if (gid >= blockSize - numTaps + 1)
         return;
 
     float acc = 0.0f;
